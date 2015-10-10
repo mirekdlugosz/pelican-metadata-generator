@@ -1,0 +1,12 @@
+- add support for additional formats
+  Pelican supports writing posts in reStructuredText, Markdown, HTML 
+  and AsciiDoc; additional readers might be provided by plugins.
+  On the other hand, we support only Markdown.
+  Eventually we should handle all file formats understood by Pelican
+  and allow user to create metadata in any of them. The easiest way
+  of achieving that might be hooking up into Pelican internal procedures.
+- improve authors support
+  Current metaphor does not really allow for easy selection of
+  multiple authors. 
+- split into multiple files?
+- model is not separated from view as well as it could be
