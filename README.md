@@ -3,6 +3,8 @@
 Graphical application that creates Pelican (<http://blog.getpelican.com/>)
 post metadata. Written in Python 3.x and Qt 5.x (PyQt).
 
+![Sample screenshot](screenshot.png)
+
 ## Rationale
 
 Pelican is static website generator that does not provide any way of
