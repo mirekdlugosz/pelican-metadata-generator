@@ -8,5 +8,11 @@
 - improve authors support
   Current metaphor does not really allow for easy selection of
   multiple authors. 
+- add "Open" menu
+  Pelican content directory must be supplied at invocation. We probably
+  should allow user to "Open" directory at runtime
 - split into multiple files?
 - model is not separated from view as well as it could be
+- verify portability
+  Both python and Qt are cross-platform, so this application should
+  work on different operating systems. But it has never been tested.
