@@ -239,7 +239,7 @@ class MetadataModel(QObject):
         value = button.text()
         self._logSignal(self.sender(), [value, str(checked)])
         if checked:
-            self.tags.append(value)
+            self.tags.append(value.replace("&", ""))
         else:
             self.tags.remove(value)
         self.changed.emit()
