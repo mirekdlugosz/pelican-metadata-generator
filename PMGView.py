@@ -25,17 +25,13 @@ class Window(QDialog):
 
         self.setWindowTitle("Pelican Metadata Generator")
 
-        self.saveAsFileButton.clicked.connect(self.showSaveDialog)
         self.saveAsFileButton.setAutoDefault(False)
         self.saveFileDialog = QFileDialog()
         self.saveFileDialog.setAcceptMode(QFileDialog.AcceptSave)
-        if path:
-            self.saveFileDialog.setDirectory(path)
 
-    def showSaveDialog(self):
-        self.saveFileDialog.selectFile(data.slug + ".md")
+    def showSaveDialog(self, filename):
+        self.saveFileDialog.selectFile(filename)
         self.saveFileDialog.exec()
-
 
 class SetupTab(QWidget):
     def __init__(self, parent=None):
@@ -72,7 +68,6 @@ class SetupTab(QWidget):
         self.categoryLine.addWidget(self.categoryList)
         self.categoryLine.addWidget(self.categoryField)
         self.categoryList.addItem("Pick value")
-        self.categoryList.addItems(sorted(known_metadata.category, key=str.lower))
 
         self.tagButtonsLayout = QGridLayout()
         self.tagButtonsGroup = QButtonGroup()
@@ -81,8 +76,6 @@ class SetupTab(QWidget):
         self.tagLine = QVBoxLayout()
         self.tagLine.addLayout(self.tagButtonsLayout)
         self.tagLine.addWidget(self.tagField)
-        for tag in sorted(known_metadata.tags, key=str.lower):
-            self.addTagButton(tag, False)
 
         self.authorList = QComboBox()
         self.authorField = QLineEdit()
@@ -90,7 +83,6 @@ class SetupTab(QWidget):
         self.authorLine.addWidget(self.authorList)
         self.authorLine.addWidget(self.authorField)
         self.authorList.addItem("Pick value")
-        self.authorList.addItems(sorted(known_metadata.authors, key=str.lower))
 
         self.summaryField = QPlainTextEdit()
         self.summaryField.setMaximumHeight(36)
@@ -136,6 +128,5 @@ class GeneratedTab(QWidget):
         mainLayout.addWidget(self.generatedField)
         self.setLayout(mainLayout)
 
-    def generateContent(self):
-        self.generatedField.setPlainText(data.dumpContent())
-
+    def set_content(self, text):
+        self.generatedField.setPlainText(text)
