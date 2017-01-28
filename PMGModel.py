@@ -20,15 +20,7 @@ class NewPostMetadata(QtCore.QObject):
 
     def set_title(self, value):
         self.title = value
-        # FIXME: business logic should be in controller?
-        # self._setSlugBasedOnTitle()
         self.changed.emit()
-
-    # FIXME: unused
-    def _setSlugBasedOnTitle(self):
-        if window.setupTab.slugActive.checkState():
-            self._slugChanged(slugify(self.title))
-            window.setupTab.slugField.setText(self.slug)
 
     def set_slug(self, value):
         self.slug = value
@@ -39,7 +31,6 @@ class NewPostMetadata(QtCore.QObject):
         self.changed.emit()
 
     def set_modified_date(self, value):
-        # FIXME: window reference
         if value:
             self.modified = value.toString("yyyy-MM-dd hh:mm:ss")
         else:
