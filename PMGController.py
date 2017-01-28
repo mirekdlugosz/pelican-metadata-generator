@@ -3,15 +3,10 @@ import sys
 import logging
 from slugify import slugify
 
-from PyQt5.QtCore import (Qt, QObject, QDateTime, pyqtSignal)
-from PyQt5.QtWidgets import (QApplication, QDialog, QFileDialog, QWidget,
-        QTabWidget, QButtonGroup,
-        QHBoxLayout, QVBoxLayout, QFormLayout, QGridLayout, 
-        QCheckBox, QPlainTextEdit, QLineEdit, QComboBox, 
-        QDateTimeEdit, QPushButton)
+from PyQt5 import (QtCore, QtWidgets)
 
 
-class Controller(QObject):
+class Controller(QtCore.QObject):
     def __init__(self, known_metadata_model=None, post_model=None, view=None):
         super(Controller, self).__init__(None)
         self.known_metadata_model = known_metadata_model

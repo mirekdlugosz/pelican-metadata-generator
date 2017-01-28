@@ -1,15 +1,12 @@
 import os
 import logging
 from slugify import slugify
-from PyQt5.QtCore import (Qt, QObject, QDateTime, pyqtSignal)
-from PyQt5.QtWidgets import (QApplication, QDialog, QFileDialog, QWidget,
-        QTabWidget, QButtonGroup,
-        QHBoxLayout, QVBoxLayout, QFormLayout, QGridLayout, 
-        QCheckBox, QPlainTextEdit, QLineEdit, QComboBox, 
-        QDateTimeEdit, QPushButton)
 
-class NewPostMetadata(QObject):
-    changed = pyqtSignal()
+from PyQt5 import (QtCore, QtWidgets)
+
+
+class NewPostMetadata(QtCore.QObject):
+    changed = QtCore.pyqtSignal()
     def __init__(self):
         super(NewPostMetadata, self).__init__(None)
         self.title = ""
