@@ -8,9 +8,8 @@ import PMGModel
 import PMGView
 import PMGController
 
-logging.basicConfig(format='%(asctime)s %(message)s', level=logging.ERROR)
-
 if __name__ == '__main__':
+    logging.basicConfig(format='%(asctime)s %(message)s', level=logging.ERROR)
     path = None
     if len(sys.argv) > 1:
         path = sys.argv[1]

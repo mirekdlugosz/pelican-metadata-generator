@@ -1,4 +1,5 @@
 import os
+import logging
 from slugify import slugify
 from PyQt5.QtCore import (Qt, QObject, QDateTime, pyqtSignal)
 from PyQt5.QtWidgets import (QApplication, QDialog, QFileDialog, QWidget,
@@ -112,12 +113,12 @@ class MetadataDatabase():
                 self._parseFile(os.path.join(root, filename))
 
     def _parseFile(self, path):
-        # logging.debug("Processing {file}".format(file=path))
+        logging.debug("Processing {file}".format(file=path))
 
         p, ext = os.path.splitext(path)
         if ext not in ['.md', '.markdown', '.mdown', '.mkd']:
             msg = "Ignoring {file} because it has unsupported extension: {extension}"
-            # logging.info(msg.format(file=path, extension=ext))
+            logging.info(msg.format(file=path, extension=ext))
             return
 
         with open(path, 'r') as f:
@@ -132,7 +133,7 @@ class MetadataDatabase():
             # Feeble attempt to skip lines that aren't real metadata
             if " " in name or "http" in name:
                 continue
-            # logging.debug("Metadata {name}: {value}".format(name=name, value=value))
+            logging.debug("Metadata {name}: {value}".format(name=name, value=value))
 
             if name in ['tags', 'category', 'author', 'authors']:
                 self._appendMeta(name, value)
@@ -160,6 +161,6 @@ class MetadataDatabase():
 
         for v in values:
             if v and v not in known_values:
-                # logging.debug("Appending {v} to {n}".format(v=v, n=name))
+                logging.debug("Appending {v} to {n}".format(v=v, n=name))
                 known_values.append(v)
                 setattr(self, name, known_values)
