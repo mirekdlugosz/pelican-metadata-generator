@@ -1,3 +1,6 @@
+- add "Open" menu
+  Pelican content directory must be supplied at invocation. We probably
+  should allow user to "Open" directory at runtime
 - add support for additional formats
   Pelican supports writing posts in reStructuredText, Markdown, HTML 
   and AsciiDoc; additional readers might be provided by plugins.
@@ -5,14 +8,18 @@
   Eventually we should handle all file formats understood by Pelican
   and allow user to create metadata in any of them. The easiest way
   of achieving that might be hooking up into Pelican internal procedures.
+- add support for writing in additional formats
+  Set format in which metadata is to be written
+- add command line switches
+  - debugging level
+  - pelican data source directory (directories?)
+  - target metadata format, once we gain support for switching them
 - improve authors support
   Current metaphor does not really allow for easy selection of
   multiple authors. 
-- add "Open" menu
-  Pelican content directory must be supplied at invocation. We probably
-  should allow user to "Open" directory at runtime
-- split into multiple files?
-- model is not separated from view as well as it could be
 - verify portability
   Both python and Qt are cross-platform, so this application should
   work on different operating systems. But it has never been tested.
+- handle `&` in read metadata
+  `&` is treated specially by Qt. We should escape it in and out
+  when sending it to view and back to model
