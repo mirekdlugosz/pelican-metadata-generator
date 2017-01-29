@@ -1,7 +1,34 @@
 from PyQt5 import (QtCore, QtWidgets)
 
 
-class Window(QtWidgets.QDialog):
+class MainWindow(QtWidgets.QMainWindow):
+    def __init__(self, parent=None):
+        super(MainWindow, self).__init__(parent)
+
+        self.app = Window()
+        self.setCentralWidget(self.app)
+
+        # FIXME?
+        # to retain compatibility with current Controller code
+        self.setupTab = self.app.setupTab
+        self.generatedTab = self.app.generatedTab
+        self.saveAsFileButton = self.app.saveAsFileButton
+        self.saveFileDialog = self.app.saveFileDialog
+
+        self.read_metadata_act = QtWidgets.QAction("Read Pelican metadata from directory", self,
+                shortcut="Ctrl+O",
+                triggered=lambda: self.readMetadataDialog.exec())
+        self.quit_act = QtWidgets.QAction("&Quit", self, shortcut="Ctrl+Q",
+                triggered=self.close)
+
+        self.fileMenu = self.menuBar().addMenu("&File")
+        self.fileMenu.addAction(self.read_metadata_act)
+        self.fileMenu.addAction(self.quit_act)
+
+        self.readMetadataDialog = QtWidgets.QFileDialog()
+        self.readMetadataDialog.setOption(QtWidgets.QFileDialog.ShowDirsOnly, True)
+
+class Window(QtWidgets.QWidget):
     def __init__(self, parent=None):
         super(Window, self).__init__(parent)
 
@@ -63,14 +90,20 @@ class SetupTab(QtWidgets.QWidget):
         self.categoryLine = QtWidgets.QHBoxLayout()
         self.categoryLine.addWidget(self.categoryList)
         self.categoryLine.addWidget(self.categoryField)
-        self.categoryList.addItem("Pick value")
 
+        tagButtonsScrollArea = QtWidgets.QScrollArea()
+        tagButtonsScrollArea.setWidgetResizable(True)
+        tagButtonsScrollArea.setMinimumSize(500, 200) #FIXME: hardcoded values
+        tagButtonsScrollArea.setHorizontalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOff)
+        tagButtonsScrollAreaWidget = QtWidgets.QWidget()
+        tagButtonsScrollArea.setWidget(tagButtonsScrollAreaWidget)
         self.tagButtonsLayout = QtWidgets.QGridLayout()
         self.tagButtonsGroup = QtWidgets.QButtonGroup()
         self.tagButtonsGroup.setExclusive(False)
+        tagButtonsScrollAreaWidget.setLayout(self.tagButtonsLayout)
         self.tagField = QtWidgets.QLineEdit()
         self.tagLine = QtWidgets.QVBoxLayout()
-        self.tagLine.addLayout(self.tagButtonsLayout)
+        self.tagLine.addWidget(tagButtonsScrollArea)
         self.tagLine.addWidget(self.tagField)
 
         self.authorList = QtWidgets.QComboBox()
@@ -78,10 +111,9 @@ class SetupTab(QtWidgets.QWidget):
         self.authorLine = QtWidgets.QHBoxLayout()
         self.authorLine.addWidget(self.authorList)
         self.authorLine.addWidget(self.authorField)
-        self.authorList.addItem("Pick value")
 
         self.summaryField = QtWidgets.QPlainTextEdit()
-        self.summaryField.setMaximumHeight(36)
+        self.summaryField.setMaximumHeight(36) #FIXME: hardcoded value
 
         mainLayout = QtWidgets.QFormLayout()
         mainLayout.addRow("Title:", self.titleField)
@@ -97,13 +129,17 @@ class SetupTab(QtWidgets.QWidget):
     def _setModifiedAllowed(self, value):
         self.modifiedField.setReadOnly(not value)
 
+    # FIXME:
+    # - tags should be always in alphabetic order
+    # - working with tags API is awkward. We could use some refactor
+    # - make number of items in row dynamic
     def addTagButton(self, tag, selected=False):
-        if selected:
-            for i in range(self.tagButtonsLayout.count()):
-                button = self.tagButtonsLayout.itemAt(i).widget()
-                if button.text() == tag:
+        for i in range(self.tagButtonsLayout.count()):
+            button = self.tagButtonsLayout.itemAt(i).widget()
+            if button.text() == tag:
+                if selected:
                     button.setChecked(True)
-                    return
+                return
 
         button = QtWidgets.QPushButton(tag)
         self.tagButtonsGroup.addButton(button)
