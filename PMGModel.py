@@ -82,18 +82,25 @@ class NewPostMetadata(QtCore.QObject):
 
         return "\n".join(output)
 
-class MetadataDatabase():
+class MetadataDatabase(QtCore.QObject):
+    changed = QtCore.pyqtSignal()
     def __init__(self, path=None):
+        super(MetadataDatabase, self).__init__(None)
         self.category = []
         self.tags = []
         self.authors = []
         self.path = []
+        self.read_directory(path)
 
-        if path:
-            path = os.path.abspath(path)
-            if (os.path.isdir(path)):
-                self._readPathFiles(path)
-                self.path = path
+    def read_directory(self, path):
+        if not path:
+            return
+
+        path = os.path.abspath(path)
+        if (os.path.isdir(path)):
+            self._readPathFiles(path)
+            self.path = path
+            self.changed.emit()
 
     def _readPathFiles(self, path):
         for root, dirs, files in os.walk(path):

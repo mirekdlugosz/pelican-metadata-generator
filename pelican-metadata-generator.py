@@ -14,12 +14,14 @@ if __name__ == '__main__':
     if len(sys.argv) > 1:
         path = sys.argv[1]
 
-    known_metadata_model = PMGModel.MetadataDatabase(path)
+    known_metadata_model = PMGModel.MetadataDatabase()
 
     app = QtWidgets.QApplication(sys.argv)
     post_model = PMGModel.NewPostMetadata()
-    window = PMGView.Window()
+    window = PMGView.MainWindow()
     controller = PMGController.Controller(known_metadata_model, post_model, window)
+
+    known_metadata_model.read_directory(path)
 
     # FIXME: be in view?
     window.setupTab.dateField.setDateTime(QtCore.QDateTime.currentDateTime())
