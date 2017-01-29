@@ -1,6 +1,3 @@
-- add "Open" menu
-  Pelican content directory must be supplied at invocation. We probably
-  should allow user to "Open" directory at runtime
 - add support for additional formats
   Pelican supports writing posts in reStructuredText, Markdown, HTML 
   and AsciiDoc; additional readers might be provided by plugins.
@@ -14,6 +11,18 @@
   - debugging level
   - pelican data source directory (directories?)
   - target metadata format, once we gain support for switching them
+- take file name from pelicanconf?
+  Currently our filename is <slug>.<ext>, whereas users might prefer other formats
+- read file and load metadata into user interface?
+  This way app might be used to modify metadata of existing file
+- don't blindly overwrite existing file
+  When user select existing file as target one:
+  - if there are no metadata in file -> append current at top
+  - if there are metadata in file -> ask user
+    - append current metadata at top (default)
+    - overwrite existing metadata with current ones
+    - select another file / cancel
+  When overwriting file, we should write to new tmp file and then move tmp on existing file location
 - improve authors support
   Current metaphor does not really allow for easy selection of
   multiple authors. 
