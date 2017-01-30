@@ -7,6 +7,7 @@ from PyQt5 import (QtCore, QtWidgets)
 
 class NewPostMetadata(QtCore.QObject):
     changed = QtCore.pyqtSignal()
+    fileHasHeaders = QtCore.pyqtSignal()
     def __init__(self):
         super(NewPostMetadata, self).__init__(None)
         self.title = ""
@@ -17,6 +18,7 @@ class NewPostMetadata(QtCore.QObject):
         self.tags = []
         self.authors = []
         self.summary = ""
+        self.file_path = ""
 
     def set_title(self, value):
         self.title = value
@@ -61,9 +63,26 @@ class NewPostMetadata(QtCore.QObject):
         self.changed.emit()
 
     def to_file(self, filepath):
-        # FIXME: filesystem manipulation needs refactor anyway
+        self.file_path = filepath
+        if os.path.exists(self.file_path):
+            self.fileHasHeaders.emit()
+        else:
+            self.to_file_new()
+
+    def to_file_prepend_headers(self):
+        print("Called to_file_prepend_headers with " + self.file_path)
+        pass
+
+    def to_file_overwrite_headers(self):
+        print("Called to_file_overwrite_headers with " + self.file_path)
+        pass
+
+    def to_file_new(self):
+        # FIXME: this is special case of prepending headers when file does not exist
+        print("Called to_file_new with " + self.file_path)
+        return
         content = self.as_pelican_header()
-        with open(filepath, 'w') as f:
+        with open(self.file_path, 'w') as f:
             f.write(content + "\n")
 
     def as_pelican_header(self):

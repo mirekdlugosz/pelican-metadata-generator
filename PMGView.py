@@ -2,6 +2,8 @@ from PyQt5 import (QtCore, QtWidgets)
 
 
 class MainWindow(QtWidgets.QMainWindow):
+    prependHeaders = QtCore.pyqtSignal()
+    overwriteHeaders = QtCore.pyqtSignal()
     def __init__(self, parent=None):
         super(MainWindow, self).__init__(parent)
 
@@ -29,6 +31,19 @@ class MainWindow(QtWidgets.QMainWindow):
         self.readMetadataDialog.setFileMode(QtWidgets.QFileDialog.Directory)
         self.readMetadataDialog.setOption(QtWidgets.QFileDialog.ShowDirsOnly, True)
 
+    def show_file_exists_dialog(self):
+        message = "<p>Do you want to overwrite headers in selected file?"\
+                "<p>Selecting \"No\" will append generated headers at top of file. "\
+                "If you want to select another file, cancel operation.</p>"
+        reply = QtWidgets.QMessageBox.question(self, "Selected file has headers",
+                message,
+                QtWidgets.QMessageBox.Yes | QtWidgets.QMessageBox.No | QtWidgets.QMessageBox.Cancel)
+        if reply == QtWidgets.QMessageBox.Yes:
+            self.overwriteHeaders.emit()
+        elif reply == QtWidgets.QMessageBox.No:
+            self.prependHeaders.emit()
+
+# FIXME: remove that class entirely
 class Window(QtWidgets.QWidget):
     def __init__(self, parent=None):
         super(Window, self).__init__(parent)
@@ -52,6 +67,7 @@ class Window(QtWidgets.QWidget):
         self.saveAsFileButton.setAutoDefault(False)
         self.saveFileDialog = QtWidgets.QFileDialog()
         self.saveFileDialog.setAcceptMode(QtWidgets.QFileDialog.AcceptSave)
+        self.saveFileDialog.setOption(QtWidgets.QFileDialog.DontConfirmOverwrite, True)
 
     def showSaveDialog(self, filename):
         self.saveFileDialog.selectFile(filename)
