@@ -26,6 +26,7 @@ class MainWindow(QtWidgets.QMainWindow):
         self.fileMenu.addAction(self.quit_act)
 
         self.readMetadataDialog = QtWidgets.QFileDialog()
+        self.readMetadataDialog.setFileMode(QtWidgets.QFileDialog.Directory)
         self.readMetadataDialog.setOption(QtWidgets.QFileDialog.ShowDirsOnly, True)
 
 class Window(QtWidgets.QWidget):
