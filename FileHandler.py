@@ -36,14 +36,14 @@ class FileHandler():
 
     def prepend_headers_stream(self, stream_handle):
         stream_handle.write(self.formatted_headers)
-        stream_handle.write("\n")
+        stream_handle.write("\n\n")
         stream_handle.write(self.raw_content)
 
     def overwrite_headers(self):
         with open(self.path, "w") as fh:
             self.overwrite_headers_stream(fh)
 
-    def overwrite_headers_stream(self):
+    def overwrite_headers_stream(self, stream_handle):
         stream_handle.write(self.formatted_headers)
         stream_handle.write("\n")
         stream_handle.write(self.post_content)
@@ -85,13 +85,13 @@ class MarkdownHandler(FileHandler):
         output.append("Title: {}".format(self.headers["title"]))
         output.append("Slug: {}".format(self.headers["slug"]))
         output.append("Date: {}".format(self.headers["date"]))
-        if self.headers["modified"]:
+        if "modified" in self.headers:
             output.append("Modified: {}".format(self.headers["modified"]))
         output.append("Category: {}".format(self.headers["category"]))
         output.append("Tags: {}".format(", ".join(sorted(self.headers["tags"], key=str.lower))))
-        if self.headers["authors"]:
+        if "authors" in self.headers:
             output.append("Authors: {}".format("; ".join(self.headers["authors"])))
-        if self.headers["summary"]:
+        if "summary" in self.headers:
             output.append("Summary: {}".format(self.headers["summary"]))
 
         return "\n".join(output)
