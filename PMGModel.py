@@ -4,6 +4,8 @@ from slugify import slugify
 
 from PyQt5 import (QtCore, QtWidgets)
 
+import FileHandler
+
 
 class NewPostMetadata(QtCore.QObject):
     changed = QtCore.pyqtSignal()
@@ -86,20 +88,19 @@ class NewPostMetadata(QtCore.QObject):
             f.write(content + "\n")
 
     def as_pelican_header(self):
-        output = []
-        output.append("Title: {t}".format(t=self.title))
-        output.append("Slug: {s}".format(s=self.slug))
-        output.append("Date: {d}".format(d=self.date))
-        if self.modified:
-            output.append("Modified: {m}".format(m=self.modified))
-        output.append("Category: {c}".format(c=self.category))
-        output.append("Tags: {t}".format(t=", ".join(sorted(self.tags, key=str.lower))))
-        if self.authors:
-            output.append("Authors: {a}".format(a="; ".join(self.authors)))
-        if self.summary:
-            output.append("Summary: {s}".format(s=self.summary))
-
-        return "\n".join(output)
+        file_ = FileHandler.MarkdownHandler("")
+        headers = {
+                "title": self.title,
+                "slug": self.slug,
+                "date": self.date,
+                "modified": self.modified or None,
+                "category": self.category,
+                "tags": self.tags,
+                "authors": self.authors or [],
+                "summary": self.summary,
+                }
+        file_.headers = headers
+        return file_.formatted_headers
 
 class MetadataDatabase(QtCore.QObject):
     changed = QtCore.pyqtSignal()
@@ -135,22 +136,11 @@ class MetadataDatabase(QtCore.QObject):
             logging.info(msg.format(file=path, extension=ext))
             return
 
-        with open(path, 'r') as f:
-            content = f.readlines()
-
-        for line in content:
-            kv = line.split(':')
-            if len(kv) != 2:
-                continue
-
-            name, value = kv[0].lower(), kv[1].strip()
-            # Feeble attempt to skip lines that aren't real metadata
-            if " " in name or "http" in name:
-                continue
-            logging.debug("Metadata {name}: {value}".format(name=name, value=value))
-
-            if name in ['tags', 'category', 'author', 'authors']:
-                self._appendMeta(name, value)
+        file_ = FileHandler.MarkdownHandler(path)
+        file_.read()
+        for header in file_.headers:
+            if header in ['tags', 'category', 'author', 'authors']:
+                self._appendMeta(header, file_.headers[header])
 
     def _appendMeta(self, name, values):
         """
@@ -160,17 +150,6 @@ class MetadataDatabase(QtCore.QObject):
         been encountered earlier.
         This way we can be sure that known values in database are unique
         """
-        if name == 'author':
-            name = 'authors'
-
-        if ';' in values:
-            values = values.split(';')
-        else:
-            values = values.split(',')
-
-        # TODO: I guess we don't support empty values? pelican does this a bit different
-        values = [v.strip() for v in values]
-
         known_values = getattr(self, name)
 
         for v in values:
