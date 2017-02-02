@@ -87,19 +87,24 @@ class NewPostMetadata(QtCore.QObject):
         with open(self.file_path, 'w') as f:
             f.write(content + "\n")
 
+    def _format_headers_object(self):
+        tags = ", ".join(sorted(self.tags, key=str.lower))
+        authors = "; ".join(self.authors)
+
+        headers = {
+                "tags": tags,
+                "authors": authors,
+            }
+
+        for key in ["title", "slug", "date", "modified", "category", "summary"]:
+            if getattr(self, key):
+                headers[key] = getattr(self, key)
+
+        return headers
+
     def as_pelican_header(self):
         file_ = FileHandler.MarkdownHandler("")
-        headers = {
-                "title": self.title,
-                "slug": self.slug,
-                "date": self.date,
-                "modified": self.modified or None,
-                "category": self.category,
-                "tags": self.tags,
-                "authors": self.authors or [],
-                "summary": self.summary,
-                }
-        file_.headers = headers
+        file_.headers = self._format_headers_object()
         return file_.formatted_headers
 
 class MetadataDatabase(QtCore.QObject):
@@ -150,7 +155,18 @@ class MetadataDatabase(QtCore.QObject):
         been encountered earlier.
         This way we can be sure that known values in database are unique
         """
+        if name == 'author':
+            name = 'authors'
+
+        if ';' in values:
+            values = values.split(';')
+        else:
+            values = values.split(',')
+
         known_values = getattr(self, name)
+
+        # TODO: I guess we don't support empty values? pelican does this a bit different
+        values = [v.strip() for v in values]
 
         for v in values:
             if v and v not in known_values:

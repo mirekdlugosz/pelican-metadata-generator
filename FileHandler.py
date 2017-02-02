@@ -1,4 +1,5 @@
 import os
+import re
 import logging
 
 
@@ -45,7 +46,7 @@ class FileHandler():
 
     def overwrite_headers_stream(self, stream_handle):
         stream_handle.write(self.formatted_headers)
-        stream_handle.write("\n")
+        stream_handle.write("\n\n")
         stream_handle.write(self.post_content)
 
 class MarkdownHandler(FileHandler):
@@ -53,31 +54,49 @@ class MarkdownHandler(FileHandler):
         super(MarkdownHandler, self).__init__(path)
 
     def read_stream(self, stream_handle):
-        self.raw_content = stream_handle.read()
-        for line in self.raw_content.split("\n"):
-            kv = line.split(':')
-            if len(kv) != 2:
+        META_RE = re.compile(r'^[ ]{0,3}(?P<key>[A-Za-z0-9_-]+):\s*(?P<value>.*)')
+        META_MORE_RE = re.compile(r'^[ ]{4,}(?P<value>.*)')
+        BEGIN_RE = re.compile(r'^-{3}(\s.*)?')
+        END_RE = re.compile(r'^(-{3}|\.{3})(\s.*)?')
+
+        raw_content = []
+        post_content = []
+        processed_headers = False
+
+        for line in stream_handle:
+            raw_content.append(line)
+
+            if processed_headers:
+                post_content.append(line)
                 continue
 
-            name, values = kv[0].lower(), kv[1].strip()
-            # Feeble attempt to skip lines that aren't real metadata
-            if " " in name or "http" in name:
+            if BEGIN_RE.match(line):
                 continue
-            logging.debug("Metadata {name}: {values}".format(name=name, values=values))
 
-            if name in ['tags', 'category', 'author', 'authors']:
-                if name == 'author':
-                    name = 'authors'
-
-                if ';' in values:
-                    values = values.split(';')
+            m1 = META_RE.match(line)
+            if m1:
+                key = m1.group('key').lower().strip()
+                value = m1.group('value').strip()
+                # We have mis-interpreted URL as key-value pair
+                if value.startswith("//"):
+                    processed_headers = True
+                    post_content.append(line)
                 else:
-                    values = values.split(',')
+                    self.headers[key] = value
+                continue
 
-                # TODO: I guess we don't support empty values? pelican does this a bit different
-                values = [v.strip() for v in values]
+            m2 = META_MORE_RE.match(line)
+            if m2 and key:
+                self.headers[key] = "{}; {}".format(self.headers[key], m2.group('value').strip())
+                continue
 
-                self.headers[name] = values
+            if line.strip() == '' or END_RE.match(line) or not m1:
+                processed_headers = True
+                if line.strip() != '':
+                    post_content.append(line)
+            
+        self.raw_content = "".join(raw_content)
+        self.post_content = "".join(post_content)
 
     @property
     def formatted_headers(self):
@@ -88,9 +107,9 @@ class MarkdownHandler(FileHandler):
         if "modified" in self.headers:
             output.append("Modified: {}".format(self.headers["modified"]))
         output.append("Category: {}".format(self.headers["category"]))
-        output.append("Tags: {}".format(", ".join(sorted(self.headers["tags"], key=str.lower))))
+        output.append("Tags: {}".format(self.headers["tags"]))
         if "authors" in self.headers:
-            output.append("Authors: {}".format("; ".join(self.headers["authors"])))
+            output.append("Authors: {}".format(self.headers["authors"]))
         if "summary" in self.headers:
             output.append("Summary: {}".format(self.headers["summary"]))
 
