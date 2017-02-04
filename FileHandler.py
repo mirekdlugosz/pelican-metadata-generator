@@ -3,14 +3,46 @@ import re
 import logging
 
 
-class FileHandler():
-    def __init__(self, path):
+class Factory():
+    """
+    Public class to be used by clients.
+    It instantiates and returns concrete FileHandler class.
+    """
+
+    def __init__(self, path, file_format=None):
         self.path = path
-        self.exists = os.path.exists(self.path)
+        self.file_format = file_format
+        self.handler = self._choose_handler()
+
+    def _choose_handler(self):
+        if not self.file_format:
+            _, ext = os.path.splitext(self.path)
+            if ext in ['.md', '.markdown', '.mdown', '.mkd']:
+                self.file_format = 'markdown'
+
+        if self.file_format == "markdown":
+            return MarkdownHandler
+        else:
+            raise NotImplementedError("File format not supported")
+
+    def generate(self):
+        return self.handler(self.path)
+
+
+class AbstractFileHandler():
+    """
+    Abstract class that defines interface used by classes resposible for
+    reading files
+    """
+    def __init__(self, path):
+        self.path = os.path.realpath(path)
+        self.exists = os.path.exists(self.path) and os.path.isfile(self.path)
         self.format = ""
         self.headers = {}
         self.post_content = ""
         self.raw_content = ""
+
+        self.read()
 
     def has_metadata(self):
         return bool(self.headers)
@@ -49,7 +81,7 @@ class FileHandler():
         stream_handle.write("\n\n")
         stream_handle.write(self.post_content)
 
-class MarkdownHandler(FileHandler):
+class MarkdownHandler(AbstractFileHandler):
     def __init__(self, path):
         super(MarkdownHandler, self).__init__(path)
 
@@ -101,16 +133,8 @@ class MarkdownHandler(FileHandler):
     @property
     def formatted_headers(self):
         output = []
-        output.append("Title: {}".format(self.headers["title"]))
-        output.append("Slug: {}".format(self.headers["slug"]))
-        output.append("Date: {}".format(self.headers["date"]))
-        if "modified" in self.headers:
-            output.append("Modified: {}".format(self.headers["modified"]))
-        output.append("Category: {}".format(self.headers["category"]))
-        output.append("Tags: {}".format(self.headers["tags"]))
-        if "authors" in self.headers:
-            output.append("Authors: {}".format(self.headers["authors"]))
-        if "summary" in self.headers:
-            output.append("Summary: {}".format(self.headers["summary"]))
+        for key in ["title", "slug", "date", "modified", "category", "tags", "authors", "summary"]:
+            if key in self.headers:
+                output.append("{}: {}".format(key.title(), self.headers[key]))
 
         return "\n".join(output)

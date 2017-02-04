@@ -20,7 +20,7 @@ class NewPostMetadata(QtCore.QObject):
         self.tags = []
         self.authors = []
         self.summary = ""
-        self.file_path = ""
+        self.file_format = 'markdown'
 
     def set_title(self, value):
         self.title = value
@@ -65,36 +65,28 @@ class NewPostMetadata(QtCore.QObject):
         self.changed.emit()
 
     def to_file(self, filepath):
-        self.file_path = filepath
-        if os.path.exists(self.file_path):
+        self.file = FileHandler.Factory(filepath, self.file_format).generate()
+
+        if self.file.has_metadata():
             self.fileHasHeaders.emit()
         else:
-            self.to_file_new()
+            self.to_file_prepend_headers()
 
     def to_file_prepend_headers(self):
-        print("Called to_file_prepend_headers with " + self.file_path)
-        pass
+        self.file.headers = self._format_headers_object()
+        self.file.prepend_headers()
 
     def to_file_overwrite_headers(self):
-        print("Called to_file_overwrite_headers with " + self.file_path)
-        pass
-
-    def to_file_new(self):
-        # FIXME: this is special case of prepending headers when file does not exist
-        print("Called to_file_new with " + self.file_path)
-        return
-        content = self.as_pelican_header()
-        with open(self.file_path, 'w') as f:
-            f.write(content + "\n")
+        self.file.headers = self._format_headers_object()
+        self.file.overwrite_headers()
 
     def _format_headers_object(self):
-        tags = ", ".join(sorted(self.tags, key=str.lower))
-        authors = "; ".join(self.authors)
+        headers = {}
 
-        headers = {
-                "tags": tags,
-                "authors": authors,
-            }
+        for separator, key in [(", ", "tags"), ("; ", "authors")]:
+            value = separator.join(sorted(getattr(self, key), key=str.lower))
+            if value:
+                headers[key] = value
 
         for key in ["title", "slug", "date", "modified", "category", "summary"]:
             if getattr(self, key):
@@ -103,7 +95,7 @@ class NewPostMetadata(QtCore.QObject):
         return headers
 
     def as_pelican_header(self):
-        file_ = FileHandler.MarkdownHandler("")
+        file_ = FileHandler.Factory("", self.file_format).generate()
         file_.headers = self._format_headers_object()
         return file_.formatted_headers
 
@@ -135,17 +127,16 @@ class MetadataDatabase(QtCore.QObject):
     def _parseFile(self, path):
         logging.debug("Processing {file}".format(file=path))
 
-        p, ext = os.path.splitext(path)
-        if ext not in ['.md', '.markdown', '.mdown', '.mkd']:
-            msg = "Ignoring {file} because it has unsupported extension: {extension}"
-            logging.info(msg.format(file=path, extension=ext))
+        try:
+            post = FileHandler.Factory(path).generate()
+        except NotImplementedError:
+            msg = "Ignoring {file} because it has unsupported extension"
+            logging.info(msg.format(file=path))
             return
 
-        file_ = FileHandler.MarkdownHandler(path)
-        file_.read()
-        for header in file_.headers:
+        for header in post.headers:
             if header in ['tags', 'category', 'author', 'authors']:
-                self._appendMeta(header, file_.headers[header])
+                self._appendMeta(header, post.headers[header])
 
     def _appendMeta(self, name, values):
         """

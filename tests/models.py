@@ -28,6 +28,11 @@ class TestPostMetadata(unittest.TestCase):
 
         self.assertNotIn("modified", headers)
 
+    def test_empty_authors_are_skipped(self):
+        headers = self.post_metadata._format_headers_object()
+
+        self.assertNotIn("authors", headers)
+
 class TestMetadataDatabase(unittest.TestCase):
 
     def setUp(self):

@@ -10,14 +10,53 @@ import FileHandler
 CUR_DIR = os.path.dirname(__file__)
 CONTENT_PATH = os.path.join(CUR_DIR, 'posts')
 
-class TestReadingMarkdownFiles(unittest.TestCase):
+class TestPostFile(unittest.TestCase):
+
+    def test_extension_md_is_markdown(self):
+        post = FileHandler.Factory(os.path.join(CONTENT_PATH , "file_that_doesnt_exist.md")).generate()
+
+        self.assertIsInstance(post, FileHandler.MarkdownHandler)
+
+    def test_extension_markdown_is_markdown(self):
+        post = FileHandler.Factory(os.path.join(CONTENT_PATH , "file_that_doesnt_exist.markdown")).generate()
+
+        self.assertIsInstance(post, FileHandler.MarkdownHandler)
+
+    def test_extension_mdown_is_markdown(self):
+        post = FileHandler.Factory(os.path.join(CONTENT_PATH , "file_that_doesnt_exist.mdown")).generate()
+
+        self.assertIsInstance(post, FileHandler.MarkdownHandler)
+
+    def test_extension_mkd_is_markdown(self):
+        post = FileHandler.Factory(os.path.join(CONTENT_PATH , "file_that_doesnt_exist.mkd")).generate()
+
+        self.assertIsInstance(post, FileHandler.MarkdownHandler)
+
+    def test_force_markdown_format_on_file_without_extension(self):
+        post = FileHandler.Factory(os.path.join(CONTENT_PATH , "file_that_doesnt_exist"), 'markdown').generate()
+
+        self.assertIsInstance(post, FileHandler.MarkdownHandler)
+
+    def test_force_markdown_format_on_file_with_other_extension(self):
+        post = FileHandler.Factory(os.path.join(CONTENT_PATH , "file_that_doesnt_exist.rst"), 'markdown').generate()
+
+        self.assertIsInstance(post, FileHandler.MarkdownHandler)
+
+class TestMarkdownHandler(unittest.TestCase):
 
     def test_read_nonexisting_file(self):
         expected_headers = {}
         expected_content = ""
         md = FileHandler.MarkdownHandler(os.path.join(CONTENT_PATH , "file_that_doesnt_exist.md"))
 
-        md.read()
+        self.assertFalse(md.exists)
+        self.assertEqual(md.headers, expected_headers)
+        self.assertEqual(md.post_content, expected_content)
+
+    def test_directory_is_treated_as_non_existing_file(self):
+        expected_headers = {}
+        expected_content = ""
+        md = FileHandler.MarkdownHandler(CONTENT_PATH)
 
         self.assertFalse(md.exists)
         self.assertEqual(md.headers, expected_headers)
@@ -28,11 +67,27 @@ class TestReadingMarkdownFiles(unittest.TestCase):
         expected_content = "File without headers\n"
         md = FileHandler.MarkdownHandler(os.path.join(CONTENT_PATH , "file_without_headers.md"))
 
-        md.read()
+        self.assertTrue(md.exists)
+        self.assertEqual(md.headers, expected_headers)
+        self.assertEqual(md.post_content, expected_content)
+
+    def test_read_long_file_without_metadata(self):
+        expected_headers = {}
+        expected_content = ("\n\n"
+                "                    GNU AFFERO GENERAL PUBLIC LICENSE\n"
+                "                       Version 3, 19 November 2007\n"
+                "\n"
+                " Copyright (C) 2007 Free Software Foundation, Inc. <http://fsf.org/>\n"
+                " Everyone is permitted to copy and distribute verbatim copies\n"
+                " of this license document, but changing it is not allowed.\n"
+                "\n"
+                )
+        md = FileHandler.MarkdownHandler(os.path.join(CONTENT_PATH , "long_file_with_blank_lines_at_top.md"))
 
         self.assertTrue(md.exists)
         self.assertEqual(md.headers, expected_headers)
         self.assertEqual(md.post_content, expected_content)
+        self.assertEqual(md.raw_content, "\n" + expected_content)
 
     def test_read_file_with_metadata(self):
         expected_headers = {
@@ -43,8 +98,6 @@ class TestReadingMarkdownFiles(unittest.TestCase):
             }
         expected_content = "File with headers\n"
         md = FileHandler.MarkdownHandler(os.path.join(CONTENT_PATH , "file_with_headers.md"))
-
-        md.read()
 
         self.assertTrue(md.exists)
         self.assertEqual(md.headers, expected_headers)
@@ -61,8 +114,6 @@ class TestReadingMarkdownFiles(unittest.TestCase):
                 )
         md = FileHandler.MarkdownHandler(os.path.join(CONTENT_PATH , "file_with_headers_after_text.md"))
 
-        md.read()
-
         self.assertTrue(md.exists)
         self.assertEqual(md.headers, expected_headers)
         self.assertEqual(md.post_content, expected_content)
@@ -76,26 +127,26 @@ class TestReadingMarkdownFiles(unittest.TestCase):
         expected_content = ""
         md = FileHandler.MarkdownHandler(os.path.join(CONTENT_PATH , "file_with_multiline_metadata.md"))
 
-        md.read()
-
         self.assertTrue(md.exists)
         self.assertEqual(md.headers, expected_headers)
         self.assertEqual(md.post_content, expected_content)
 
     def test_read_file_with_YAML_headers(self):
+        filepath = os.path.join(CONTENT_PATH , "file_with_YAML_headers.md")
+        with open(filepath) as fh:
+            expected_raw_content = fh.read()
         expected_headers = {
                 "title": "File with YAML headers",
                 "slug": "file-with-yaml-headers",
                 "category": "Markdown",
             }
         expected_content = "This file has YAML-style headers\n"
-        md = FileHandler.MarkdownHandler(os.path.join(CONTENT_PATH , "file_with_YAML_headers.md"))
-
-        md.read()
+        md = FileHandler.MarkdownHandler(filepath)
 
         self.assertTrue(md.exists)
         self.assertEqual(md.headers, expected_headers)
         self.assertEqual(md.post_content, expected_content)
+        self.assertEqual(md.raw_content, expected_raw_content)
 
     def test_read_file_without_separator_between_headers_and_content(self):
         expected_headers = {
@@ -104,8 +155,6 @@ class TestReadingMarkdownFiles(unittest.TestCase):
             }
         expected_content = "This file has no separator between headers and content\n"
         md = FileHandler.MarkdownHandler(os.path.join(CONTENT_PATH , "file_without_separator.md"))
-
-        md.read()
 
         self.assertTrue(md.exists)
         self.assertEqual(md.headers, expected_headers)
@@ -117,8 +166,6 @@ class TestReadingMarkdownFiles(unittest.TestCase):
             }
         expected_content = "http://miroslaw-zalewski.eu/\n"
         md = FileHandler.MarkdownHandler(os.path.join(CONTENT_PATH , "url_in_first_line.md"))
-
-        md.read()
 
         self.assertTrue(md.exists)
         self.assertEqual(md.headers, expected_headers)
@@ -132,15 +179,49 @@ class TestReadingMarkdownFiles(unittest.TestCase):
         expected_content = "Test: This is normal text, not header\n"
         md = FileHandler.MarkdownHandler(os.path.join(CONTENT_PATH , "file_with_colon_in_first_line.md"))
 
-        md.read()
-
         self.assertTrue(md.exists)
         self.assertEqual(md.headers, expected_headers)
         self.assertEqual(md.post_content, expected_content)
 
-class TestWritingHeaders(unittest.TestCase):
+    def test_generate_headers_without_title(self):
+        expected = (
+                "Slug: without-headers\n"
+                "Date: 2017-02-01 12:00"
+                )
+        md = FileHandler.MarkdownHandler(os.path.join(CONTENT_PATH, "file_that_doesnt_exist.md"))
+        md.headers = {
+                "slug": "without-headers",
+                "date": "2017-02-01 12:00",
+                }
 
-    def test_markdown_prepend_headers_non_existing_file(self):
+        self.assertEqual(md.formatted_headers, expected)
+
+    def test_generate_headers_order(self):
+        expected = (
+                "Title: Predictable order\n"
+                "Slug: predictable-order\n"
+                "Date: 2017-02-01 12:00\n"
+                "Modified: 2017-02-01 12:01\n"
+                "Category: Markdown\n"
+                "Tags: Headers, Markdown\n"
+                "Authors: Mirosław Zalewski\n"
+                "Summary: Headers are written in predictable order"
+                )
+        md = FileHandler.MarkdownHandler(os.path.join(CONTENT_PATH, "file_that_doesnt_exist.md"))
+        md.headers = {
+                "modified": "2017-02-01 12:01",
+                "summary": "Headers are written in predictable order",
+                "category": "Markdown",
+                "title": "Predictable order",
+                "tags": "Headers, Markdown",
+                "slug": "predictable-order",
+                "authors": "Mirosław Zalewski",
+                "date": "2017-02-01 12:00",
+                }
+
+        self.assertEqual(md.formatted_headers, expected)
+
+    def test_prepend_headers_non_existing_file(self):
         expected = (
                 "Title: Sample title\n"
                 "Slug: sample-title\n"
@@ -151,7 +232,6 @@ class TestWritingHeaders(unittest.TestCase):
                 )
         test_stream = io.StringIO()
         md = FileHandler.MarkdownHandler(os.path.join(CONTENT_PATH , "file_that_doesnt_exist.md"))
-        md.read()
         md.headers = {
                 "title": "Sample title",
                 "slug": "sample-title",
@@ -165,7 +245,7 @@ class TestWritingHeaders(unittest.TestCase):
 
         self.assertEqual(test_stream.read(), expected)
 
-    def test_markdown_overwrite_headers_non_existing_file(self):
+    def test_overwrite_headers_non_existing_file(self):
         expected = (
                 "Title: Sample title\n"
                 "Slug: sample-title\n"
@@ -176,7 +256,6 @@ class TestWritingHeaders(unittest.TestCase):
                 )
         test_stream = io.StringIO()
         md = FileHandler.MarkdownHandler(os.path.join(CONTENT_PATH , "file_that_doesnt_exist.md"))
-        md.read()
         md.headers = {
                 "title": "Sample title",
                 "slug": "sample-title",
@@ -190,7 +269,7 @@ class TestWritingHeaders(unittest.TestCase):
 
         self.assertEqual(test_stream.read(), expected)
 
-    def test_markdown_prepend_headers_file_without_headers(self):
+    def test_prepend_headers_file_without_headers(self):
         expected = (
                 "Title: Sample title\n"
                 "Slug: sample-title\n"
@@ -202,7 +281,6 @@ class TestWritingHeaders(unittest.TestCase):
                 )
         test_stream = io.StringIO()
         md = FileHandler.MarkdownHandler(os.path.join(CONTENT_PATH , "file_without_headers.md"))
-        md.read()
         md.headers = {
                 "title": "Sample title",
                 "slug": "sample-title",
@@ -216,7 +294,7 @@ class TestWritingHeaders(unittest.TestCase):
 
         self.assertEqual(test_stream.read(), expected)
 
-    def test_markdown_overwrite_headers_file_without_headers(self):
+    def test_overwrite_headers_file_without_headers(self):
         expected = (
                 "Title: Sample title\n"
                 "Slug: sample-title\n"
@@ -228,7 +306,6 @@ class TestWritingHeaders(unittest.TestCase):
                 )
         test_stream = io.StringIO()
         md = FileHandler.MarkdownHandler(os.path.join(CONTENT_PATH , "file_without_headers.md"))
-        md.read()
         md.headers = {
                 "title": "Sample title",
                 "slug": "sample-title",
@@ -242,7 +319,7 @@ class TestWritingHeaders(unittest.TestCase):
 
         self.assertEqual(test_stream.read(), expected)
 
-    def test_markdown_prepend_headers_file_with_headers(self):
+    def test_prepend_headers_file_with_headers(self):
         expected = (
                 "Title: Sample title\n"
                 "Slug: sample-title\n"
@@ -259,7 +336,6 @@ class TestWritingHeaders(unittest.TestCase):
                 )
         test_stream = io.StringIO()
         md = FileHandler.MarkdownHandler(os.path.join(CONTENT_PATH , "file_with_headers.md"))
-        md.read()
         md.headers = {
                 "title": "Sample title",
                 "slug": "sample-title",
@@ -273,7 +349,7 @@ class TestWritingHeaders(unittest.TestCase):
 
         self.assertEqual(test_stream.read(), expected)
 
-    def test_markdown_overwrite_headers_file_with_headers(self):
+    def test_overwrite_headers_file_with_headers(self):
         expected = (
                 "Title: Sample title\n"
                 "Slug: sample-title\n"
@@ -285,7 +361,6 @@ class TestWritingHeaders(unittest.TestCase):
                 )
         test_stream = io.StringIO()
         md = FileHandler.MarkdownHandler(os.path.join(CONTENT_PATH , "file_with_headers.md"))
-        md.read()
         md.headers = {
                 "title": "Sample title",
                 "slug": "sample-title",
