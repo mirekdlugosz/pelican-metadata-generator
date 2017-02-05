@@ -16,6 +16,7 @@ class Controller(QtCore.QObject):
 
     def setup_connections(self):
         self.view.readMetadataDialog.fileSelected.connect(self.known_metadata_model.read_directory)
+        self.view.choose_file_format_group.triggered.connect(self._set_file_format)
         self.view.setupTab.titleField.textChanged.connect(self._set_title)
         self.view.setupTab.slugActive.stateChanged.connect(self._set_slug_based_on_title)
         self.view.setupTab.slugField.textEdited.connect(self.post_model.set_slug)
@@ -29,13 +30,16 @@ class Controller(QtCore.QObject):
         self.view.setupTab.authorList.currentIndexChanged.connect(self._author_list_item_selected)
         self.view.setupTab.authorField.textChanged.connect(self.post_model.set_author)
         self.view.setupTab.summaryField.textChanged.connect(lambda: self.post_model.set_summary(self.view.setupTab.summaryField.toPlainText()))
-        self.view.saveAsFileButton.clicked.connect(lambda: self.view.app.showSaveDialog(self.post_model.slug + ".md"))
+        self.view.saveAsFileButton.clicked.connect(lambda: self.view.app.showSaveDialog(self.post_model.filename))
         self.view.saveFileDialog.fileSelected.connect(self.post_model.to_file)
         self.view.prependHeaders.connect(self.post_model.to_file_prepend_headers)
         self.view.overwriteHeaders.connect(self.post_model.to_file_overwrite_headers)
         self.post_model.fileHasHeaders.connect(self.view.show_file_exists_dialog)
         self.post_model.changed.connect(lambda: self.view.generatedTab.set_content(self.post_model.as_pelican_header()))
         self.known_metadata_model.changed.connect(self._update_view_options_based_on_metadata)
+
+    def _set_file_format(self, value):
+        self.post_model.set_file_format(value.text().lower())
 
     def _set_title(self, value):
         self.post_model.set_title(value)

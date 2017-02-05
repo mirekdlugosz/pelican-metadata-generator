@@ -1,0 +1,1 @@
+:authors: Mirosław Zalewski

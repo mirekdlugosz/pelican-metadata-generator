@@ -20,7 +20,12 @@ class NewPostMetadata(QtCore.QObject):
         self.tags = []
         self.authors = []
         self.summary = ""
-        self.file_format = 'markdown'
+        self.file_format = "markdown"
+
+    @property
+    def filename(self):
+        ext = FileHandler.Factory("", self.file_format).generate().default_extension
+        return "{}.{}".format(self.slug, ext)
 
     def set_title(self, value):
         self.title = value
@@ -62,6 +67,10 @@ class NewPostMetadata(QtCore.QObject):
 
     def set_summary(self, text):
         self.summary = text
+        self.changed.emit()
+
+    def set_file_format(self, file_format):
+        self.file_format = file_format
         self.changed.emit()
 
     def to_file(self, filepath):

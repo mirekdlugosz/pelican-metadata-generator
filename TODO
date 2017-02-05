@@ -1,16 +1,7 @@
-- add support for additional formats
-  Pelican supports writing posts in reStructuredText, Markdown, HTML 
-  and AsciiDoc; additional readers might be provided by plugins.
-  On the other hand, we support only Markdown.
-  Eventually we should handle all file formats understood by Pelican
-  and allow user to create metadata in any of them. The easiest way
-  of achieving that might be hooking up into Pelican internal procedures.
-- add support for writing in additional formats
-  Set format in which metadata is to be written
 - add command line switches
   - debugging level
   - pelican data source directory (directories?)
-  - target metadata format, once we gain support for switching them
+  - target metadata format
 - take file name from pelicanconf?
   Currently our filename is <slug>.<ext>, whereas users might prefer other formats
 - read file and load metadata into user interface?

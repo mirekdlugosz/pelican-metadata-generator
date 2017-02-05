@@ -22,9 +22,17 @@ class MainWindow(QtWidgets.QMainWindow):
                 triggered=lambda: self.readMetadataDialog.exec())
         self.quit_act = QtWidgets.QAction("&Quit", self, shortcut="Ctrl+Q",
                 triggered=self.close)
+        self.markdown_act = QtWidgets.QAction("Markdown", self, checkable = True)
+        self.restructuredtext_act = QtWidgets.QAction("ReStructuredText", self, checkable = True)
+        self.choose_file_format_group = QtWidgets.QActionGroup(self)
+        self.choose_file_format_group.addAction(self.markdown_act)
+        self.choose_file_format_group.addAction(self.restructuredtext_act)
 
         self.fileMenu = self.menuBar().addMenu("&File")
         self.fileMenu.addAction(self.read_metadata_act)
+        self.choose_file_format_menu = self.fileMenu.addMenu("Output file format")
+        for file_format in self.choose_file_format_group.actions():
+            self.choose_file_format_menu.addAction(file_format)
         self.fileMenu.addAction(self.quit_act)
 
         self.readMetadataDialog = QtWidgets.QFileDialog()
