@@ -55,7 +55,7 @@ class AbstractFileHandler():
         if not self.exists:
             return
 
-        with open(self.path, "r") as fh:
+        with open(self.path, "r", encoding="utf-8") as fh:
             self.read_stream(fh)
 
     def read_stream(self, stream_handle):
@@ -68,7 +68,7 @@ class AbstractFileHandler():
         pass
 
     def prepend_headers(self):
-        with open(self.path, "w") as fh:
+        with open(self.path, "w", encoding="utf-8") as fh:
             self.prepend_headers_stream(fh)
 
     def prepend_headers_stream(self, stream_handle):
@@ -77,7 +77,7 @@ class AbstractFileHandler():
         stream_handle.write(self.raw_content)
 
     def overwrite_headers(self):
-        with open(self.path, "w") as fh:
+        with open(self.path, "w", encoding="utf-8") as fh:
             self.overwrite_headers_stream(fh)
 
     def overwrite_headers_stream(self, stream_handle):
