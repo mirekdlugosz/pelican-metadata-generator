@@ -116,15 +116,15 @@ class SetupTab(QtWidgets.QWidget):
         self.categoryLine.addWidget(self.categoryList)
         self.categoryLine.addWidget(self.categoryField)
 
+        self.tagButtonsLayout = QtWidgets.QGridLayout()
+        self.tagButtonsGroup = QtWidgets.QButtonGroup()
+        self.tagButtonsGroup.setExclusive(False)
         tagButtonsScrollArea = QtWidgets.QScrollArea()
         tagButtonsScrollArea.setWidgetResizable(True)
         tagButtonsScrollArea.setMinimumSize(500, 200) #FIXME: hardcoded values
         tagButtonsScrollArea.setHorizontalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOff)
         tagButtonsScrollAreaWidget = QtWidgets.QWidget()
         tagButtonsScrollArea.setWidget(tagButtonsScrollAreaWidget)
-        self.tagButtonsLayout = QtWidgets.QGridLayout()
-        self.tagButtonsGroup = QtWidgets.QButtonGroup()
-        self.tagButtonsGroup.setExclusive(False)
         tagButtonsScrollAreaWidget.setLayout(self.tagButtonsLayout)
         self.tagField = QtWidgets.QLineEdit()
         self.tagLine = QtWidgets.QVBoxLayout()
@@ -154,26 +154,24 @@ class SetupTab(QtWidgets.QWidget):
     def _setModifiedAllowed(self, value):
         self.modifiedField.setReadOnly(not value)
 
-    # FIXME:
-    # - tags should be always in alphabetic order
-    # - working with tags API is awkward. We could use some refactor
-    # - make number of items in row dynamic
-    def addTagButton(self, tag, selected=False):
-        for i in range(self.tagButtonsLayout.count()):
-            button = self.tagButtonsLayout.itemAt(i).widget()
-            if button.text() == tag:
-                if selected:
-                    button.setChecked(True)
-                return
+    def setTagButtons(self, available_tags, checked_tags):
+        while True:
+            item = self.tagButtonsLayout.itemAt(0)
+            if not item:
+                break
+            self.tagButtonsGroup.removeButton(item.widget())
+            self.tagButtonsLayout.removeItem(item)
+            item.widget().setParent(None)
 
-        button = QtWidgets.QPushButton(tag)
-        self.tagButtonsGroup.addButton(button)
-        button.setAutoDefault(False)
-        button.setCheckable(True)
-        button.setChecked(selected)
-        i = self.tagButtonsLayout.count()
-        inRow = 4
-        self.tagButtonsLayout.addWidget(button, i / inRow, i % inRow)
+        for tag in available_tags:
+            button = QtWidgets.QPushButton(tag)
+            self.tagButtonsGroup.addButton(button)
+            button.setAutoDefault(False)
+            button.setCheckable(True)
+            button.setChecked(tag in checked_tags)
+            i = self.tagButtonsLayout.count()
+            inRow = 4 # FIXME: hardcoded value
+            self.tagButtonsLayout.addWidget(button, i / inRow, i % inRow)
 
 class GeneratedTab(QtWidgets.QWidget):
     def __init__(self, parent=None):

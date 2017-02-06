@@ -26,7 +26,7 @@ class Controller(QtCore.QObject):
         self.view.setupTab.categoryList.currentIndexChanged.connect(self._category_list_item_selected)
         self.view.setupTab.categoryField.textChanged.connect(self.post_model.set_category)
         self.view.setupTab.tagButtonsGroup.buttonToggled.connect(self._tag_button_toggled)
-        self.view.setupTab.tagField.returnPressed.connect(self._tag_field_accepted)
+        self.view.setupTab.tagField.returnPressed.connect(self._set_tags_group)
         self.view.setupTab.authorList.currentIndexChanged.connect(self._author_list_item_selected)
         self.view.setupTab.authorField.textChanged.connect(self.post_model.set_author)
         self.view.setupTab.summaryField.textChanged.connect(lambda: self.post_model.set_summary(self.view.setupTab.summaryField.toPlainText()))
@@ -70,21 +70,30 @@ class Controller(QtCore.QObject):
 
     def _tag_button_toggled(self, button, checked):
         value = button.text()
+        value = "&".join(value.split("&&"))
         if checked:
             self.post_model.add_tag(value)
         else:
             self.post_model.remove_tag(value)
 
-    def _tag_field_accepted(self):
-        # FIXME: new tag should be added to known metadata primarily, and NewPostMetadata only secondly
+    def _set_tags_group(self):
         values = self.view.setupTab.tagField.text()
-        for tag in values.split(','):
+        separator = ','
+        if ';' in values:
+            separator = ';'
+
+        for tag in values.split(separator):
             tag = tag.strip()
             if not tag:
                 continue
-            self.view.setupTab.addTagButton(tag, True)
+            if not tag in self.known_metadata_model.tags:
+                self.known_metadata_model.tags.append(tag)
+            self.post_model.add_tag(tag)
 
         self.view.setupTab.tagField.clear()
+        known_tags = [ "&&".join(x.split("&")) for x in sorted(self.known_metadata_model.tags) ]
+        checked_tags = [ "&&".join(x.split("&"))for x in self.post_model.tags ]
+        self.view.setupTab.setTagButtons(known_tags, checked_tags)
 
     def _set_combobox_values(self, qcombobox, values):
         new_values = ["Pick value"]
@@ -94,8 +103,7 @@ class Controller(QtCore.QObject):
 
     def _update_view_options_based_on_metadata(self):
         self.view.saveFileDialog.setDirectory(self.known_metadata_model.path)
+        self._set_tags_group()
         self._set_combobox_values(self.view.setupTab.categoryList, self.known_metadata_model.category)
-        for tag in sorted(self.known_metadata_model.tags, key=str.lower):
-            self.view.setupTab.addTagButton(tag, False)
         self._set_combobox_values(self.view.setupTab.authorList, self.known_metadata_model.authors)
 

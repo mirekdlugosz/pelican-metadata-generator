@@ -8,6 +8,3 @@
 - verify portability
   Both python and Qt are cross-platform, so this application should
   work on different operating systems. But it has never been tested.
-- handle `&` in read metadata
-  `&` is treated specially by Qt. We should escape it in and out
-  when sending it to view and back to model

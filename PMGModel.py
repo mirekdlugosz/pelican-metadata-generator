@@ -51,7 +51,8 @@ class NewPostMetadata(QtCore.QObject):
         self.changed.emit()
 
     def add_tag(self, value):
-        self.tags.append(value)
+        if value not in self.tags:
+            self.tags.append(value)
         self.changed.emit()
 
     def remove_tag(self, value):
