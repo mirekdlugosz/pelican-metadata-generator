@@ -9,6 +9,7 @@ class MainWindow(QtWidgets.QMainWindow):
 
         self.app = Window()
         self.setCentralWidget(self.app)
+        self.setWindowTitle("Pelican Metadata Generator")
 
         # FIXME?
         # to retain compatibility with current Controller code

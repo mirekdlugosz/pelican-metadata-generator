@@ -1,6 +1,6 @@
 [Desktop Entry]
 Comment=Create new Pelican posts using GUI
-Exec=pelican-metadata-generator.py /your/pelican/directory/content/
+Exec=pelican-metadata-generator.py -d /your/pelican/directory/content/
 GenericName=Generate new Pelican blog post
 Icon=pelican
 Name=Pelican Metadata Generator
