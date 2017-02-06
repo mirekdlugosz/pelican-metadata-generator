@@ -20,7 +20,7 @@ class NewPostMetadata(QtCore.QObject):
         self.tags = []
         self.authors = []
         self.summary = ""
-        self.file_format = "markdown"
+        self.file_format = ""
 
     @property
     def filename(self):

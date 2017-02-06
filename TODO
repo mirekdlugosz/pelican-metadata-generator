@@ -1,7 +1,3 @@
-- add command line switches
-  - debugging level
-  - pelican data source directory (directories?)
-  - target metadata format
 - take file name from pelicanconf?
   Currently our filename is <slug>.<ext>, whereas users might prefer other formats
 - read file and load metadata into user interface?
