@@ -106,4 +106,3 @@ class Controller(QtCore.QObject):
         self._set_tags_group()
         self._set_combobox_values(self.view.setupTab.categoryList, self.known_metadata_model.category)
         self._set_combobox_values(self.view.setupTab.authorList, self.known_metadata_model.authors)
-

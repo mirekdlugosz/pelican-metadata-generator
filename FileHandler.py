@@ -5,8 +5,18 @@ import logging
 
 class Factory():
     """
-    Public class to be used by clients.
-    It instantiates and returns concrete FileHandler class.
+    Public-facing class that chooses appropriate FileHandler class for users
+
+    Note
+    ----
+    You should call ``generate`` immediately after instantiating this class.
+
+    Parameters
+    ----------
+    path
+        Path to file (FileHandler will be chosen based on extension).
+    file_format
+        Required format of FileHandler.
     """
 
     def __init__(self, path, file_format=None):
@@ -15,6 +25,7 @@ class Factory():
         self.handler = self._choose_handler()
 
     def _choose_handler(self):
+        """Chooses and returns FileHandler object based on extension or user request"""
         if not self.file_format:
             _, ext = os.path.splitext(self.path)
             if ext in ['.md', '.markdown', '.mdown', '.mkd']:
@@ -30,12 +41,19 @@ class Factory():
             raise NotImplementedError("File format not supported")
 
     def generate(self):
+        """Returns instantiated FileHandler object"""
         return self.handler(self.path)
 
 class AbstractFileHandler():
     """
-    Abstract class that defines interface used by classes resposible for
-    reading files
+    Abstract class that defines interface used by classes responsible for
+    reading files. It is not intended to be used directly - rather, specific
+    file formats should subclass it.
+
+    Parameters
+    ----------
+    path
+        Path to file (FileHandler will be chosen based on extension).
     """
     def __init__(self, path):
         self.path = os.path.realpath(path)
@@ -49,9 +67,13 @@ class AbstractFileHandler():
         self.read()
 
     def has_metadata(self):
+        """True if file has metadata"""
         return bool(self.headers)
 
     def read(self):
+        """Reads file content
+        This method can be used to work with real files.
+        """
         if not self.exists:
             return
 
@@ -59,33 +81,60 @@ class AbstractFileHandler():
             self.read_stream(fh)
 
     def read_stream(self, stream_handle):
-        """ Child classes are expected to override this method """
+        """Reads and parses file format
+        This method can be used to work with any object that provides
+        file stream API.
+
+        Note
+        ----
+        Child classes are expected to override this method
+        """
         pass
 
     @property
     def formatted_headers(self):
-        """ Child classes are expected to override this method """
+        """Returns file metadata in given format as string
+
+        Note
+        ----
+        Child classes are expected to override this method
+        """
         pass
 
     def prepend_headers(self):
+        """Adds file metadata at top of file (leaving existing metadata as-is)
+        This method can be used to work with real files.
+        """
         with open(self.path, "w", encoding="utf-8") as fh:
             self.prepend_headers_stream(fh)
 
     def prepend_headers_stream(self, stream_handle):
+        """Adds file metadata at top of file (leaving existing metadata as-is)
+        This method can be used to work with any object that provides
+        file stream API.
+        """
         stream_handle.write(self.formatted_headers)
         stream_handle.write("\n\n")
         stream_handle.write(self.raw_content)
 
     def overwrite_headers(self):
+        """Adds file metadata at top of file (removing existing metadata)
+        This method can be used to work with real files.
+        """
         with open(self.path, "w", encoding="utf-8") as fh:
             self.overwrite_headers_stream(fh)
 
     def overwrite_headers_stream(self, stream_handle):
+        """Adds file metadata at top of file (removing existing metadata)
+        This method can be used to work with any object that provides
+        file stream API.
+        """
         stream_handle.write(self.formatted_headers)
         stream_handle.write("\n\n")
         stream_handle.write(self.post_content)
 
 class MarkdownHandler(AbstractFileHandler):
+    """Markdown metadata parser"""
     def __init__(self, path):
         super(MarkdownHandler, self).__init__(path)
         self.default_extension = 'md'
@@ -146,6 +195,7 @@ class MarkdownHandler(AbstractFileHandler):
         return "\n".join(output)
 
 class RestructuredtextHandler(AbstractFileHandler):
+    """ReStructuredText metadata parser"""
     def __init__(self, path):
         super(RestructuredtextHandler, self).__init__(path)
         self.default_extension = 'rst'

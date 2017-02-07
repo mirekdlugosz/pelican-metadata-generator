@@ -2,6 +2,7 @@ from PyQt5 import (QtCore, QtWidgets)
 
 
 class MainWindow(QtWidgets.QMainWindow):
+    """Builds main application window"""
     prependHeaders = QtCore.pyqtSignal()
     overwriteHeaders = QtCore.pyqtSignal()
     def __init__(self, parent=None):
@@ -83,6 +84,7 @@ class Window(QtWidgets.QWidget):
         self.saveFileDialog.exec()
 
 class SetupTab(QtWidgets.QWidget):
+    """Builds main tab (with input fields)"""
     def __init__(self, parent=None):
         super(SetupTab, self).__init__(parent)
 
@@ -175,6 +177,7 @@ class SetupTab(QtWidgets.QWidget):
             self.tagButtonsLayout.addWidget(button, i / inRow, i % inRow)
 
 class GeneratedTab(QtWidgets.QWidget):
+    """Builds preview headers tab"""
     def __init__(self, parent=None):
         super(GeneratedTab, self).__init__(parent)
 

@@ -8,6 +8,29 @@ import FileHandler
 
 
 class NewPostMetadata(QtCore.QObject):
+    """Represents metadata of new post
+
+    Attributes
+    ----------
+    title
+        Post title
+    slug
+        Post slug (URL-safe identifier)
+    date
+        Created date
+    modified
+        Last modified date
+    category
+        Post category
+    tags
+        Post tags (list)
+    authors
+        Post authors (list)
+    summary
+        Post summary
+    file_format
+        File format. See FileHandler.Factory for supported file formats.
+    """
     changed = QtCore.pyqtSignal()
     fileHasHeaders = QtCore.pyqtSignal()
     def __init__(self):
@@ -24,6 +47,7 @@ class NewPostMetadata(QtCore.QObject):
 
     @property
     def filename(self):
+        """Returns file name based on file format"""
         ext = FileHandler.Factory("", self.file_format).generate().default_extension
         return "{}.{}".format(self.slug, ext)
 
@@ -75,6 +99,16 @@ class NewPostMetadata(QtCore.QObject):
         self.changed.emit()
 
     def to_file(self, filepath):
+        """Main method used to save current metadata into file
+
+        Note
+        ----
+        It reads file content in order to verify if file contains
+        valid metadata. If it does, it does nothing.
+        Instead, controller is responsible for asking user what should
+        be done and calling appropriate method directly (adding headers
+        at top of file or overwriting existing metadata).
+        """
         self.file = FileHandler.Factory(filepath, self.file_format).generate()
 
         if self.file.has_metadata():
@@ -83,16 +117,20 @@ class NewPostMetadata(QtCore.QObject):
             self.to_file_prepend_headers()
 
     def to_file_prepend_headers(self):
+        """Adds metadata at top of file content (leaving existing metadata as-is)"""
         self.file.headers = self._format_headers_object()
         self.file.prepend_headers()
 
     def to_file_overwrite_headers(self):
+        """Adds metadata in place of existing metadata"""
         self.file.headers = self._format_headers_object()
         self.file.overwrite_headers()
 
     def _format_headers_object(self):
+        """Prepares dictionary of metadata to inject in FileHandler subclass"""
         headers = {}
 
+        # FIXME - use comma and semicolon conditionally
         for separator, key in [(", ", "tags"), ("; ", "authors")]:
             value = separator.join(sorted(getattr(self, key), key=str.lower))
             if value:
@@ -105,11 +143,36 @@ class NewPostMetadata(QtCore.QObject):
         return headers
 
     def as_pelican_header(self):
+        """Returns current metadata as string, formatted according to file
+        format rules"""
         file_ = FileHandler.Factory("", self.file_format).generate()
         file_.headers = self._format_headers_object()
         return file_.formatted_headers
 
 class MetadataDatabase(QtCore.QObject):
+    """Represents all known metadata values
+
+    Attributes
+    ----------
+    category
+        List of categories
+    tags
+        List of tags
+    authors
+        List of authors
+
+        Note
+        ----
+        No parsing of author value is attempted.
+        "John Doe" and "Doe, John" are considered not equal,
+        even if they probably represent the same person.
+    path
+        Path of last read directory
+
+        Note
+        ----
+        It is intended for internal use of model methods.
+    """
     changed = QtCore.pyqtSignal()
     def __init__(self, path=None):
         super(MetadataDatabase, self).__init__(None)
@@ -120,6 +183,13 @@ class MetadataDatabase(QtCore.QObject):
         self.read_directory(path)
 
     def read_directory(self, path):
+        """Reads metadata from files in directory
+
+        Parameters
+        ----------
+        path
+            Path of directory that should be read.
+        """
         if not path:
             return
 
@@ -150,7 +220,7 @@ class MetadataDatabase(QtCore.QObject):
 
     def _appendMeta(self, name, values):
         """
-        This takes string that is metadata tag value, makes it a list 
+        This takes string that is metadata tag value, makes it a list
         (separated by semicolon or comma), and appends element from list
         into database of known values for given tag if that value hasn't
         been encountered earlier.
