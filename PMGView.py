@@ -43,11 +43,13 @@ class MainWindow(QtWidgets.QMainWindow):
 
     def show_file_exists_dialog(self):
         message = "<p>Do you want to overwrite headers in selected file?"\
-                "<p>Selecting \"No\" will append generated headers at top of file. "\
+                "<p>Selecting \"No\" will append generated headers at top of file, "\
+                "leaving current file content intact. "\
                 "If you want to select another file, cancel operation.</p>"
         reply = QtWidgets.QMessageBox.question(self, "Selected file has headers",
                 message,
-                QtWidgets.QMessageBox.Yes | QtWidgets.QMessageBox.No | QtWidgets.QMessageBox.Cancel)
+                QtWidgets.QMessageBox.Yes | QtWidgets.QMessageBox.No | QtWidgets.QMessageBox.Cancel,
+                QtWidgets.QMessageBox.No)
         if reply == QtWidgets.QMessageBox.Yes:
             self.overwriteHeaders.emit()
         elif reply == QtWidgets.QMessageBox.No:
