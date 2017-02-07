@@ -68,6 +68,7 @@ class Window(QtWidgets.QWidget):
         tabWidget.addTab(self.generatedTab, "Generated metadata")
 
         self.saveAsFileButton = QtWidgets.QPushButton("Save as file")
+        self.saveAsFileButton.setShortcut("Ctrl+S")
 
         mainLayout = QtWidgets.QVBoxLayout()
         mainLayout.addWidget(tabWidget)
