@@ -5,6 +5,3 @@
 - improve authors support
   Current metaphor does not really allow for easy selection of
   multiple authors. 
-- verify portability
-  Both python and Qt are cross-platform, so this application should
-  work on different operating systems. But it has never been tested.
