@@ -130,11 +130,16 @@ class NewPostMetadata(QtCore.QObject):
         """Prepares dictionary of metadata to inject in FileHandler subclass"""
         headers = {}
 
-        # FIXME - use comma and semicolon conditionally
-        for separator, key in [(", ", "tags"), ("; ", "authors")]:
-            value = separator.join(sorted(getattr(self, key), key=str.lower))
-            if value:
-                headers[key] = value
+        for key in ["tags", "authors"]:
+            values = getattr(self, key)
+            if not values:
+                continue
+
+            separator = ", "
+            if any([ "," in x for x in values ]):
+                separator = "; "
+
+            headers[key] = separator.join(sorted(values, key=str.lower))
 
         for key in ["title", "slug", "date", "modified", "category", "summary"]:
             if getattr(self, key):

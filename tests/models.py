@@ -15,10 +15,18 @@ class TestPostMetadata(unittest.TestCase):
     def setUp(self):
         self.post_metadata = PMGModel.NewPostMetadata()
 
-    def test_tags_formatting(self):
+    def test_tags_order(self):
         expected = "Another, Tag"
 
         self.post_metadata.tags = ["Tag", "Another"]
+        headers = self.post_metadata._format_headers_object()
+
+        self.assertEqual(headers["tags"], expected)
+
+    def test_tags_with_comma(self):
+        expected = "One, Two; Three, Four"
+
+        self.post_metadata.tags = ["One, Two", "Three, Four"]
         headers = self.post_metadata._format_headers_object()
 
         self.assertEqual(headers["tags"], expected)
