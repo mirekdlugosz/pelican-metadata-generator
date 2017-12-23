@@ -70,7 +70,9 @@ class Controller(QtCore.QObject):
 
     def _tag_button_toggled(self, button, checked):
         value = button.text()
-        value = "&".join(value.split("&&"))
+        value = "!#@%!".join(value.split("&&"))
+        value = value.replace("&", "")
+        value = value.replace("!#@%!", "&")
         if checked:
             self.post_model.add_tag(value)
         else:
@@ -92,7 +94,7 @@ class Controller(QtCore.QObject):
 
         self.view.setupTab.tagField.clear()
         known_tags = [ "&&".join(x.split("&")) for x in sorted(self.known_metadata_model.tags) ]
-        checked_tags = [ "&&".join(x.split("&"))for x in self.post_model.tags ]
+        checked_tags = [ "&&".join(x.split("&")) for x in self.post_model.tags ]
         self.view.setupTab.setTagButtons(known_tags, checked_tags)
 
     def _set_combobox_values(self, qcombobox, values):
