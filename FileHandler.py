@@ -38,7 +38,7 @@ class Factory():
         elif self.file_format == 'restructuredtext':
             return RestructuredtextHandler
         else:
-            raise NotImplementedError("File format not supported")
+            raise NotImplementedError("File format not supported: {}".format(self.file_format))
 
     def generate(self):
         """Returns instantiated FileHandler object"""

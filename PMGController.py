@@ -39,7 +39,7 @@ class Controller(QtCore.QObject):
         self.known_metadata_model.changed.connect(self._update_view_options_based_on_metadata)
 
     def _set_file_format(self, value):
-        self.post_model.set_file_format(value.text().lower())
+        self.post_model.set_file_format(value.text().lower().replace("&", ""))
 
     def _set_title(self, value):
         self.post_model.set_title(value)
