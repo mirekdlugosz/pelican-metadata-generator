@@ -88,13 +88,13 @@ class Controller(QtCore.QObject):
             tag = tag.strip()
             if not tag:
                 continue
-            if not tag in self.known_metadata_model.tags:
+            if tag not in self.known_metadata_model.tags:
                 self.known_metadata_model.tags.append(tag)
             self.post_model.add_tag(tag)
 
         self.view.setupTab.tagField.clear()
-        known_tags = [ "&&".join(x.split("&")) for x in sorted(self.known_metadata_model.tags) ]
-        checked_tags = [ "&&".join(x.split("&")) for x in self.post_model.tags ]
+        known_tags = ["&&".join(x.split("&")) for x in sorted(self.known_metadata_model.tags)]
+        checked_tags = ["&&".join(x.split("&")) for x in self.post_model.tags]
         self.view.setupTab.setTagButtons(known_tags, checked_tags)
 
     def _set_combobox_values(self, qcombobox, values):

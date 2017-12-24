@@ -14,14 +14,15 @@ def process_args():
     description = "Generate Pelican post metadata based on previous content"
     parser = argparse.ArgumentParser(description=description)
     parser.add_argument('--format', '-f', help="Output file format",
-            choices=["markdown", "restructuredtext"],
-            default="markdown")
+                        choices=["markdown", "restructuredtext"],
+                        default="markdown")
     parser.add_argument('--debug', '-v', help="Be more verbose; may be passed up to 5 times",
             action="count")
     parser.add_argument('--directory', '-d', help="Directories to read metadata from",
             nargs='*', default=[])
 
     return parser.parse_known_args()
+
 
 if __name__ == '__main__':
     args, unparsed_args = process_args()

@@ -5,6 +5,7 @@ class MainWindow(QtWidgets.QMainWindow):
     """Builds main application window"""
     prependHeaders = QtCore.pyqtSignal()
     overwriteHeaders = QtCore.pyqtSignal()
+
     def __init__(self, parent=None):
         super(MainWindow, self).__init__(parent)
 
@@ -24,8 +25,8 @@ class MainWindow(QtWidgets.QMainWindow):
                 triggered=lambda: self.readMetadataDialog.exec())
         self.quit_act = QtWidgets.QAction("&Quit", self, shortcut="Ctrl+Q",
                 triggered=self.close)
-        self.markdown_act = QtWidgets.QAction("Markdown", self, checkable = True)
-        self.restructuredtext_act = QtWidgets.QAction("ReStructuredText", self, checkable = True)
+        self.markdown_act = QtWidgets.QAction("Markdown", self, checkable=True)
+        self.restructuredtext_act = QtWidgets.QAction("ReStructuredText", self, checkable=True)
         self.choose_file_format_group = QtWidgets.QActionGroup(self)
         self.choose_file_format_group.addAction(self.markdown_act)
         self.choose_file_format_group.addAction(self.restructuredtext_act)
@@ -42,10 +43,12 @@ class MainWindow(QtWidgets.QMainWindow):
         self.readMetadataDialog.setOption(QtWidgets.QFileDialog.ShowDirsOnly, True)
 
     def show_file_exists_dialog(self):
-        message = "<p>Do you want to overwrite headers in selected file?"\
-                "<p>Selecting \"No\" will append generated headers at top of file, "\
-                "leaving current file content intact. "\
-                "If you want to select another file, cancel operation.</p>"
+        message = """
+            <p>Do you want to overwrite headers in selected file?
+            <p>Selecting \"No\" will append generated headers at top of file,
+            leaving current file content intact.
+            If you want to select another file, cancel operation.</p>
+            """
         reply = QtWidgets.QMessageBox.question(self, "Selected file has headers",
                 message,
                 QtWidgets.QMessageBox.Yes | QtWidgets.QMessageBox.No | QtWidgets.QMessageBox.Cancel,
@@ -54,6 +57,7 @@ class MainWindow(QtWidgets.QMainWindow):
             self.overwriteHeaders.emit()
         elif reply == QtWidgets.QMessageBox.No:
             self.prependHeaders.emit()
+
 
 # FIXME: remove that class entirely
 class Window(QtWidgets.QWidget):
@@ -85,6 +89,7 @@ class Window(QtWidgets.QWidget):
     def showSaveDialog(self, filename):
         self.saveFileDialog.selectFile(filename)
         self.saveFileDialog.exec()
+
 
 class SetupTab(QtWidgets.QWidget):
     """Builds main tab (with input fields)"""
@@ -127,7 +132,7 @@ class SetupTab(QtWidgets.QWidget):
         self.tagButtonsGroup.setExclusive(False)
         tagButtonsScrollArea = QtWidgets.QScrollArea()
         tagButtonsScrollArea.setWidgetResizable(True)
-        tagButtonsScrollArea.setMinimumSize(500, 200) #FIXME: hardcoded values
+        tagButtonsScrollArea.setMinimumSize(500, 200)  # FIXME: hardcoded values
         tagButtonsScrollArea.setHorizontalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOff)
         tagButtonsScrollAreaWidget = QtWidgets.QWidget()
         tagButtonsScrollArea.setWidget(tagButtonsScrollAreaWidget)
@@ -144,7 +149,7 @@ class SetupTab(QtWidgets.QWidget):
         self.authorLine.addWidget(self.authorField)
 
         self.summaryField = QtWidgets.QPlainTextEdit()
-        self.summaryField.setMaximumHeight(36) #FIXME: hardcoded value
+        self.summaryField.setMaximumHeight(36)  # FIXME: hardcoded value
 
         mainLayout = QtWidgets.QFormLayout()
         mainLayout.addRow("Title:", self.titleField)
@@ -176,8 +181,9 @@ class SetupTab(QtWidgets.QWidget):
             button.setCheckable(True)
             button.setChecked(tag in checked_tags)
             i = self.tagButtonsLayout.count()
-            inRow = 4 # FIXME: hardcoded value
+            inRow = 4  # FIXME: hardcoded value
             self.tagButtonsLayout.addWidget(button, i / inRow, i % inRow)
+
 
 class GeneratedTab(QtWidgets.QWidget):
     """Builds preview headers tab"""

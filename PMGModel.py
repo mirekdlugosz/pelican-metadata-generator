@@ -33,6 +33,7 @@ class NewPostMetadata(QtCore.QObject):
     """
     changed = QtCore.pyqtSignal()
     fileHasHeaders = QtCore.pyqtSignal()
+
     def __init__(self):
         super(NewPostMetadata, self).__init__(None)
         self.title = ""
@@ -136,7 +137,7 @@ class NewPostMetadata(QtCore.QObject):
                 continue
 
             separator = ", "
-            if any([ "," in x for x in values ]):
+            if any(["," in x for x in values]):
                 separator = "; "
 
             headers[key] = separator.join(sorted(values, key=str.lower))
@@ -153,6 +154,7 @@ class NewPostMetadata(QtCore.QObject):
         file_ = FileHandler.Factory("", self.file_format).generate()
         file_.headers = self._format_headers_object()
         return file_.formatted_headers
+
 
 class MetadataDatabase(QtCore.QObject):
     """Represents all known metadata values
@@ -179,6 +181,7 @@ class MetadataDatabase(QtCore.QObject):
         It is intended for internal use of model methods.
     """
     changed = QtCore.pyqtSignal()
+
     def __init__(self, path=None):
         super(MetadataDatabase, self).__init__(None)
         self.category = []
