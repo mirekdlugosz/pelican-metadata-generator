@@ -58,6 +58,8 @@ if __name__ == '__main__':
         if file_format_action.text().lower() == file_format:
             file_format_action.setChecked(True)
     window.setupTab.dateField.setDateTime(QtCore.QDateTime.currentDateTime())
+    if len(known_metadata_model.category) == 1:
+        window.setupTab.categoryList.setCurrentIndex(1)
     window.show()
 
     sys.exit(app.exec_())
