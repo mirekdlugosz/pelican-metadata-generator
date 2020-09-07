@@ -4,7 +4,7 @@ import os
 import io
 import logging
 
-import PMGModel
+from pelican_metadata_generator import model
 
 
 CUR_DIR = os.path.dirname(__file__)
@@ -13,7 +13,7 @@ CONTENT_PATH = os.path.join(CUR_DIR, 'posts')
 class TestPostMetadata(unittest.TestCase):
 
     def setUp(self):
-        self.post_metadata = PMGModel.NewPostMetadata()
+        self.post_metadata = model.NewPostMetadata()
 
     def test_tags_order(self):
         expected = "Another, Tag"
@@ -44,7 +44,7 @@ class TestPostMetadata(unittest.TestCase):
 class TestMetadataDatabase(unittest.TestCase):
 
     def setUp(self):
-        self.db = PMGModel.MetadataDatabase()
+        self.db = model.MetadataDatabase()
 
     def test_read_tags_separated_by_commas(self):
         expected = ["First", "Tag"]

@@ -4,7 +4,7 @@ import os
 import io
 import logging
 
-import FileHandler
+from pelican_metadata_generator import file_handler
 
 
 CUR_DIR = os.path.dirname(__file__)
@@ -13,41 +13,41 @@ CONTENT_PATH = os.path.join(CUR_DIR, 'posts')
 class TestPostFile(unittest.TestCase):
 
     def test_extension_md_is_markdown(self):
-        post = FileHandler.Factory(os.path.join(CONTENT_PATH , "file_that_doesnt_exist.md")).generate()
+        post = file_handler.Factory(os.path.join(CONTENT_PATH , "file_that_doesnt_exist.md")).generate()
 
-        self.assertIsInstance(post, FileHandler.MarkdownHandler)
+        self.assertIsInstance(post, file_handler.MarkdownHandler)
 
     def test_extension_markdown_is_markdown(self):
-        post = FileHandler.Factory(os.path.join(CONTENT_PATH , "file_that_doesnt_exist.markdown")).generate()
+        post = file_handler.Factory(os.path.join(CONTENT_PATH , "file_that_doesnt_exist.markdown")).generate()
 
-        self.assertIsInstance(post, FileHandler.MarkdownHandler)
+        self.assertIsInstance(post, file_handler.MarkdownHandler)
 
     def test_extension_mdown_is_markdown(self):
-        post = FileHandler.Factory(os.path.join(CONTENT_PATH , "file_that_doesnt_exist.mdown")).generate()
+        post = file_handler.Factory(os.path.join(CONTENT_PATH , "file_that_doesnt_exist.mdown")).generate()
 
-        self.assertIsInstance(post, FileHandler.MarkdownHandler)
+        self.assertIsInstance(post, file_handler.MarkdownHandler)
 
     def test_extension_mkd_is_markdown(self):
-        post = FileHandler.Factory(os.path.join(CONTENT_PATH , "file_that_doesnt_exist.mkd")).generate()
+        post = file_handler.Factory(os.path.join(CONTENT_PATH , "file_that_doesnt_exist.mkd")).generate()
 
-        self.assertIsInstance(post, FileHandler.MarkdownHandler)
+        self.assertIsInstance(post, file_handler.MarkdownHandler)
 
     def test_force_markdown_format_on_file_without_extension(self):
-        post = FileHandler.Factory(os.path.join(CONTENT_PATH , "file_that_doesnt_exist"), 'markdown').generate()
+        post = file_handler.Factory(os.path.join(CONTENT_PATH , "file_that_doesnt_exist"), 'markdown').generate()
 
-        self.assertIsInstance(post, FileHandler.MarkdownHandler)
+        self.assertIsInstance(post, file_handler.MarkdownHandler)
 
     def test_force_markdown_format_on_file_with_other_extension(self):
-        post = FileHandler.Factory(os.path.join(CONTENT_PATH , "file_that_doesnt_exist.rst"), 'markdown').generate()
+        post = file_handler.Factory(os.path.join(CONTENT_PATH , "file_that_doesnt_exist.rst"), 'markdown').generate()
 
-        self.assertIsInstance(post, FileHandler.MarkdownHandler)
+        self.assertIsInstance(post, file_handler.MarkdownHandler)
 
 class TestMarkdownHandler(unittest.TestCase):
 
     def test_read_nonexisting_file(self):
         expected_headers = {}
         expected_content = ""
-        md = FileHandler.MarkdownHandler(os.path.join(CONTENT_PATH , "file_that_doesnt_exist.md"))
+        md = file_handler.MarkdownHandler(os.path.join(CONTENT_PATH , "file_that_doesnt_exist.md"))
 
         self.assertFalse(md.exists)
         self.assertEqual(md.headers, expected_headers)
@@ -56,7 +56,7 @@ class TestMarkdownHandler(unittest.TestCase):
     def test_directory_is_treated_as_non_existing_file(self):
         expected_headers = {}
         expected_content = ""
-        md = FileHandler.MarkdownHandler(CONTENT_PATH)
+        md = file_handler.MarkdownHandler(CONTENT_PATH)
 
         self.assertFalse(md.exists)
         self.assertEqual(md.headers, expected_headers)
@@ -65,7 +65,7 @@ class TestMarkdownHandler(unittest.TestCase):
     def test_read_file_without_metadata(self):
         expected_headers = {}
         expected_content = "File without headers\n"
-        md = FileHandler.MarkdownHandler(os.path.join(CONTENT_PATH , "file_without_headers.md"))
+        md = file_handler.MarkdownHandler(os.path.join(CONTENT_PATH , "file_without_headers.md"))
 
         self.assertTrue(md.exists)
         self.assertEqual(md.headers, expected_headers)
@@ -82,7 +82,7 @@ class TestMarkdownHandler(unittest.TestCase):
                 " of this license document, but changing it is not allowed.\n"
                 "\n"
                 )
-        md = FileHandler.MarkdownHandler(os.path.join(CONTENT_PATH , "long_file_with_blank_lines_at_top.md"))
+        md = file_handler.MarkdownHandler(os.path.join(CONTENT_PATH , "long_file_with_blank_lines_at_top.md"))
 
         self.assertTrue(md.exists)
         self.assertEqual(md.headers, expected_headers)
@@ -97,7 +97,7 @@ class TestMarkdownHandler(unittest.TestCase):
                 "tags": "File, Tag, Testing",
             }
         expected_content = "File with headers\n"
-        md = FileHandler.MarkdownHandler(os.path.join(CONTENT_PATH , "file_with_headers.md"))
+        md = file_handler.MarkdownHandler(os.path.join(CONTENT_PATH , "file_with_headers.md"))
 
         self.assertTrue(md.exists)
         self.assertEqual(md.headers, expected_headers)
@@ -112,7 +112,7 @@ class TestMarkdownHandler(unittest.TestCase):
                 "Slug: file-with-metadata-in-text\n"
                 "And one more paragraph\n"
                 )
-        md = FileHandler.MarkdownHandler(os.path.join(CONTENT_PATH , "file_with_headers_after_text.md"))
+        md = file_handler.MarkdownHandler(os.path.join(CONTENT_PATH , "file_with_headers_after_text.md"))
 
         self.assertTrue(md.exists)
         self.assertEqual(md.headers, expected_headers)
@@ -125,7 +125,7 @@ class TestMarkdownHandler(unittest.TestCase):
                 "tags": "File; Tag; Testing",
             }
         expected_content = ""
-        md = FileHandler.MarkdownHandler(os.path.join(CONTENT_PATH , "file_with_multiline_metadata.md"))
+        md = file_handler.MarkdownHandler(os.path.join(CONTENT_PATH , "file_with_multiline_metadata.md"))
 
         self.assertTrue(md.exists)
         self.assertEqual(md.headers, expected_headers)
@@ -141,7 +141,7 @@ class TestMarkdownHandler(unittest.TestCase):
                 "category": "Markdown",
             }
         expected_content = "This file has YAML-style headers\n"
-        md = FileHandler.MarkdownHandler(filepath)
+        md = file_handler.MarkdownHandler(filepath)
 
         self.assertTrue(md.exists)
         self.assertEqual(md.headers, expected_headers)
@@ -154,7 +154,7 @@ class TestMarkdownHandler(unittest.TestCase):
                 "category": "Markdown",
             }
         expected_content = "This file has no separator between headers and content\n"
-        md = FileHandler.MarkdownHandler(os.path.join(CONTENT_PATH , "file_without_separator.md"))
+        md = file_handler.MarkdownHandler(os.path.join(CONTENT_PATH , "file_without_separator.md"))
 
         self.assertTrue(md.exists)
         self.assertEqual(md.headers, expected_headers)
@@ -165,7 +165,7 @@ class TestMarkdownHandler(unittest.TestCase):
                 "title": "URL below headers",
             }
         expected_content = "http://miroslaw-zalewski.eu/\n"
-        md = FileHandler.MarkdownHandler(os.path.join(CONTENT_PATH , "url_in_first_line.md"))
+        md = file_handler.MarkdownHandler(os.path.join(CONTENT_PATH , "url_in_first_line.md"))
 
         self.assertTrue(md.exists)
         self.assertEqual(md.headers, expected_headers)
@@ -177,7 +177,7 @@ class TestMarkdownHandler(unittest.TestCase):
                 "category": "Markdown",
             }
         expected_content = "Test: This is normal text, not header\n"
-        md = FileHandler.MarkdownHandler(os.path.join(CONTENT_PATH , "file_with_colon_in_first_line.md"))
+        md = file_handler.MarkdownHandler(os.path.join(CONTENT_PATH , "file_with_colon_in_first_line.md"))
 
         self.assertTrue(md.exists)
         self.assertEqual(md.headers, expected_headers)
@@ -188,7 +188,7 @@ class TestMarkdownHandler(unittest.TestCase):
                 "Slug: without-headers\n"
                 "Date: 2017-02-01 12:00"
                 )
-        md = FileHandler.MarkdownHandler(os.path.join(CONTENT_PATH, "file_that_doesnt_exist.md"))
+        md = file_handler.MarkdownHandler(os.path.join(CONTENT_PATH, "file_that_doesnt_exist.md"))
         md.headers = {
                 "slug": "without-headers",
                 "date": "2017-02-01 12:00",
@@ -207,7 +207,7 @@ class TestMarkdownHandler(unittest.TestCase):
                 "Authors: Mirosław Zalewski\n"
                 "Summary: Headers are written in predictable order"
                 )
-        md = FileHandler.MarkdownHandler(os.path.join(CONTENT_PATH, "file_that_doesnt_exist.md"))
+        md = file_handler.MarkdownHandler(os.path.join(CONTENT_PATH, "file_that_doesnt_exist.md"))
         md.headers = {
                 "modified": "2017-02-01 12:01",
                 "summary": "Headers are written in predictable order",
@@ -231,7 +231,7 @@ class TestMarkdownHandler(unittest.TestCase):
                 "\n"
                 )
         test_stream = io.StringIO()
-        md = FileHandler.MarkdownHandler(os.path.join(CONTENT_PATH , "file_that_doesnt_exist.md"))
+        md = file_handler.MarkdownHandler(os.path.join(CONTENT_PATH , "file_that_doesnt_exist.md"))
         md.headers = {
                 "title": "Sample title",
                 "slug": "sample-title",
@@ -255,7 +255,7 @@ class TestMarkdownHandler(unittest.TestCase):
                 "\n"
                 )
         test_stream = io.StringIO()
-        md = FileHandler.MarkdownHandler(os.path.join(CONTENT_PATH , "file_that_doesnt_exist.md"))
+        md = file_handler.MarkdownHandler(os.path.join(CONTENT_PATH , "file_that_doesnt_exist.md"))
         md.headers = {
                 "title": "Sample title",
                 "slug": "sample-title",
@@ -280,7 +280,7 @@ class TestMarkdownHandler(unittest.TestCase):
                 "File without headers\n"
                 )
         test_stream = io.StringIO()
-        md = FileHandler.MarkdownHandler(os.path.join(CONTENT_PATH , "file_without_headers.md"))
+        md = file_handler.MarkdownHandler(os.path.join(CONTENT_PATH , "file_without_headers.md"))
         md.headers = {
                 "title": "Sample title",
                 "slug": "sample-title",
@@ -305,7 +305,7 @@ class TestMarkdownHandler(unittest.TestCase):
                 "File without headers\n"
                 )
         test_stream = io.StringIO()
-        md = FileHandler.MarkdownHandler(os.path.join(CONTENT_PATH , "file_without_headers.md"))
+        md = file_handler.MarkdownHandler(os.path.join(CONTENT_PATH , "file_without_headers.md"))
         md.headers = {
                 "title": "Sample title",
                 "slug": "sample-title",
@@ -335,7 +335,7 @@ class TestMarkdownHandler(unittest.TestCase):
                 "File with headers\n"
                 )
         test_stream = io.StringIO()
-        md = FileHandler.MarkdownHandler(os.path.join(CONTENT_PATH , "file_with_headers.md"))
+        md = file_handler.MarkdownHandler(os.path.join(CONTENT_PATH , "file_with_headers.md"))
         md.headers = {
                 "title": "Sample title",
                 "slug": "sample-title",
@@ -360,7 +360,7 @@ class TestMarkdownHandler(unittest.TestCase):
                 "File with headers\n"
                 )
         test_stream = io.StringIO()
-        md = FileHandler.MarkdownHandler(os.path.join(CONTENT_PATH , "file_with_headers.md"))
+        md = file_handler.MarkdownHandler(os.path.join(CONTENT_PATH , "file_with_headers.md"))
         md.headers = {
                 "title": "Sample title",
                 "slug": "sample-title",
@@ -392,7 +392,7 @@ class TestMarkdownHandler(unittest.TestCase):
                 "File with headers\n"
                 )
         test_stream = io.StringIO()
-        md = FileHandler.MarkdownHandler(os.path.join(CONTENT_PATH , "file_with_headers.rst"))
+        md = file_handler.MarkdownHandler(os.path.join(CONTENT_PATH , "file_with_headers.rst"))
         md.headers = {
                 "title": "Sample title",
                 "slug": "sample-title",
@@ -424,7 +424,7 @@ class TestMarkdownHandler(unittest.TestCase):
                 "File with headers\n"
                 )
         test_stream = io.StringIO()
-        md = FileHandler.MarkdownHandler(os.path.join(CONTENT_PATH , "file_with_headers.rst"))
+        md = file_handler.MarkdownHandler(os.path.join(CONTENT_PATH , "file_with_headers.rst"))
         md.headers = {
                 "title": "Sample title",
                 "slug": "sample-title",
@@ -444,7 +444,7 @@ class TestRestructuredtextHandler(unittest.TestCase):
     def test_read_nonexisting_file(self):
         expected_headers = {}
         expected_content = ""
-        rst = FileHandler.RestructuredtextHandler(os.path.join(CONTENT_PATH , "file_that_doesnt_exist.rst"))
+        rst = file_handler.RestructuredtextHandler(os.path.join(CONTENT_PATH , "file_that_doesnt_exist.rst"))
 
         self.assertFalse(rst.exists)
         self.assertEqual(rst.headers, expected_headers)
@@ -453,7 +453,7 @@ class TestRestructuredtextHandler(unittest.TestCase):
     def test_directory_is_treated_as_non_existing_file(self):
         expected_headers = {}
         expected_content = ""
-        rst = FileHandler.RestructuredtextHandler(CONTENT_PATH)
+        rst = file_handler.RestructuredtextHandler(CONTENT_PATH)
 
         self.assertFalse(rst.exists)
         self.assertEqual(rst.headers, expected_headers)
@@ -462,7 +462,7 @@ class TestRestructuredtextHandler(unittest.TestCase):
     def test_read_file_without_metadata(self):
         expected_headers = {}
         expected_content = "File without headers\n"
-        rst = FileHandler.RestructuredtextHandler(os.path.join(CONTENT_PATH , "file_without_headers.rst"))
+        rst = file_handler.RestructuredtextHandler(os.path.join(CONTENT_PATH , "file_without_headers.rst"))
 
         self.assertTrue(rst.exists)
         self.assertEqual(rst.headers, expected_headers)
@@ -479,7 +479,7 @@ class TestRestructuredtextHandler(unittest.TestCase):
                 " of this license document, but changing it is not allowed.\n"
                 "\n"
                 )
-        rst = FileHandler.RestructuredtextHandler(os.path.join(CONTENT_PATH , "long_file_with_blank_lines_at_top.rst"))
+        rst = file_handler.RestructuredtextHandler(os.path.join(CONTENT_PATH , "long_file_with_blank_lines_at_top.rst"))
 
         self.assertTrue(rst.exists)
         self.assertEqual(rst.headers, expected_headers)
@@ -494,7 +494,7 @@ class TestRestructuredtextHandler(unittest.TestCase):
                 "tags": "File, Tag, Testing",
             }
         expected_content = "File with headers\n"
-        rst = FileHandler.RestructuredtextHandler(os.path.join(CONTENT_PATH , "file_with_headers.rst"))
+        rst = file_handler.RestructuredtextHandler(os.path.join(CONTENT_PATH , "file_with_headers.rst"))
 
         self.assertTrue(rst.exists)
         self.assertEqual(rst.headers, expected_headers)
@@ -509,7 +509,7 @@ class TestRestructuredtextHandler(unittest.TestCase):
                 ":slug: file-with-metadata-in-text\n"
                 "And one more paragraph\n"
                 )
-        rst = FileHandler.RestructuredtextHandler(os.path.join(CONTENT_PATH , "file_with_headers_after_text.rst"))
+        rst = file_handler.RestructuredtextHandler(os.path.join(CONTENT_PATH , "file_with_headers_after_text.rst"))
 
         self.assertTrue(rst.exists)
         self.assertEqual(rst.headers, expected_headers)
@@ -523,7 +523,7 @@ class TestRestructuredtextHandler(unittest.TestCase):
         expected_content = (
                 "Sample paragraph\n"
                 )
-        rst = FileHandler.RestructuredtextHandler(os.path.join(CONTENT_PATH , "file_with_headers_right_after_title.rst"))
+        rst = file_handler.RestructuredtextHandler(os.path.join(CONTENT_PATH , "file_with_headers_right_after_title.rst"))
 
         self.assertTrue(rst.exists)
         self.assertEqual(rst.headers, expected_headers)
@@ -536,7 +536,7 @@ class TestRestructuredtextHandler(unittest.TestCase):
                 "summary": "This is long summary that takes multiple lines as input"
             }
         expected_content = ""
-        rst = FileHandler.RestructuredtextHandler(os.path.join(CONTENT_PATH , "file_with_multiline_metadata.rst"))
+        rst = file_handler.RestructuredtextHandler(os.path.join(CONTENT_PATH , "file_with_multiline_metadata.rst"))
 
         self.assertTrue(rst.exists)
         self.assertEqual(rst.headers, expected_headers)
@@ -549,7 +549,7 @@ class TestRestructuredtextHandler(unittest.TestCase):
                 "authors": "Author, First; Author, Second"
             }
         expected_content = ""
-        rst = FileHandler.RestructuredtextHandler(os.path.join(CONTENT_PATH , "file_with_list_metadata.rst"))
+        rst = file_handler.RestructuredtextHandler(os.path.join(CONTENT_PATH , "file_with_list_metadata.rst"))
 
         self.assertTrue(rst.exists)
         self.assertEqual(rst.headers, expected_headers)
@@ -560,7 +560,7 @@ class TestRestructuredtextHandler(unittest.TestCase):
                 "title": "File with title only",
             }
         expected_content = "This file has title, but no other metadata\n"
-        rst = FileHandler.RestructuredtextHandler(os.path.join(CONTENT_PATH , "file_with_title_only.rst"))
+        rst = file_handler.RestructuredtextHandler(os.path.join(CONTENT_PATH , "file_with_title_only.rst"))
 
         self.assertTrue(rst.exists)
         self.assertEqual(rst.headers, expected_headers)
@@ -572,7 +572,7 @@ class TestRestructuredtextHandler(unittest.TestCase):
                 "category": "ReStructuredText",
             }
         expected_content = ":test: This is normal text, not header\n"
-        rst = FileHandler.RestructuredtextHandler(os.path.join(CONTENT_PATH , "file_with_colon_in_first_line.rst"))
+        rst = file_handler.RestructuredtextHandler(os.path.join(CONTENT_PATH , "file_with_colon_in_first_line.rst"))
 
         self.assertTrue(rst.exists)
         self.assertEqual(rst.headers, expected_headers)
@@ -583,7 +583,7 @@ class TestRestructuredtextHandler(unittest.TestCase):
                 ":slug: without-headers\n"
                 ":date: 2017-02-01 12:00"
                 )
-        rst = FileHandler.RestructuredtextHandler(os.path.join(CONTENT_PATH, "file_that_doesnt_exist.rst"))
+        rst = file_handler.RestructuredtextHandler(os.path.join(CONTENT_PATH, "file_that_doesnt_exist.rst"))
         rst.headers = {
                 "slug": "without-headers",
                 "date": "2017-02-01 12:00",
@@ -604,7 +604,7 @@ class TestRestructuredtextHandler(unittest.TestCase):
                 ":authors: Mirosław Zalewski\n"
                 ":summary: Headers are written in predictable order"
                 )
-        rst = FileHandler.RestructuredtextHandler(os.path.join(CONTENT_PATH, "file_that_doesnt_exist.rst"))
+        rst = file_handler.RestructuredtextHandler(os.path.join(CONTENT_PATH, "file_that_doesnt_exist.rst"))
         rst.headers = {
                 "modified": "2017-02-01 12:01",
                 "summary": "Headers are written in predictable order",
@@ -630,7 +630,7 @@ class TestRestructuredtextHandler(unittest.TestCase):
                 "\n"
                 )
         test_stream = io.StringIO()
-        rst = FileHandler.RestructuredtextHandler(os.path.join(CONTENT_PATH , "file_that_doesnt_exist.rst"))
+        rst = file_handler.RestructuredtextHandler(os.path.join(CONTENT_PATH , "file_that_doesnt_exist.rst"))
         rst.headers = {
                 "title": "Sample title",
                 "slug": "sample-title",
@@ -656,7 +656,7 @@ class TestRestructuredtextHandler(unittest.TestCase):
                 "\n"
                 )
         test_stream = io.StringIO()
-        rst = FileHandler.RestructuredtextHandler(os.path.join(CONTENT_PATH , "file_that_doesnt_exist.rst"))
+        rst = file_handler.RestructuredtextHandler(os.path.join(CONTENT_PATH , "file_that_doesnt_exist.rst"))
         rst.headers = {
                 "title": "Sample title",
                 "slug": "sample-title",
@@ -683,7 +683,7 @@ class TestRestructuredtextHandler(unittest.TestCase):
                 "File without headers\n"
                 )
         test_stream = io.StringIO()
-        rst = FileHandler.RestructuredtextHandler(os.path.join(CONTENT_PATH , "file_without_headers.rst"))
+        rst = file_handler.RestructuredtextHandler(os.path.join(CONTENT_PATH , "file_without_headers.rst"))
         rst.headers = {
                 "title": "Sample title",
                 "slug": "sample-title",
@@ -710,7 +710,7 @@ class TestRestructuredtextHandler(unittest.TestCase):
                 "File without headers\n"
                 )
         test_stream = io.StringIO()
-        rst = FileHandler.RestructuredtextHandler(os.path.join(CONTENT_PATH , "file_without_headers.rst"))
+        rst = file_handler.RestructuredtextHandler(os.path.join(CONTENT_PATH , "file_without_headers.rst"))
         rst.headers = {
                 "title": "Sample title",
                 "slug": "sample-title",
@@ -744,7 +744,7 @@ class TestRestructuredtextHandler(unittest.TestCase):
                 "File with headers\n"
                 )
         test_stream = io.StringIO()
-        rst = FileHandler.RestructuredtextHandler(os.path.join(CONTENT_PATH , "file_with_headers.rst"))
+        rst = file_handler.RestructuredtextHandler(os.path.join(CONTENT_PATH , "file_with_headers.rst"))
         rst.headers = {
                 "title": "Sample title",
                 "slug": "sample-title",
@@ -771,7 +771,7 @@ class TestRestructuredtextHandler(unittest.TestCase):
                 "File with headers\n"
                 )
         test_stream = io.StringIO()
-        rst = FileHandler.RestructuredtextHandler(os.path.join(CONTENT_PATH , "file_with_headers.rst"))
+        rst = file_handler.RestructuredtextHandler(os.path.join(CONTENT_PATH , "file_with_headers.rst"))
         rst.headers = {
                 "title": "Sample title",
                 "slug": "sample-title",
@@ -803,7 +803,7 @@ class TestRestructuredtextHandler(unittest.TestCase):
                 "File with headers\n"
                 )
         test_stream = io.StringIO()
-        rst = FileHandler.RestructuredtextHandler(os.path.join(CONTENT_PATH , "file_with_headers.md"))
+        rst = file_handler.RestructuredtextHandler(os.path.join(CONTENT_PATH , "file_with_headers.md"))
         rst.headers = {
                 "title": "Sample title",
                 "slug": "sample-title",
@@ -835,7 +835,7 @@ class TestRestructuredtextHandler(unittest.TestCase):
                 "File with headers\n"
                 )
         test_stream = io.StringIO()
-        rst = FileHandler.RestructuredtextHandler(os.path.join(CONTENT_PATH , "file_with_headers.md"))
+        rst = file_handler.RestructuredtextHandler(os.path.join(CONTENT_PATH , "file_with_headers.md"))
         rst.headers = {
                 "title": "Sample title",
                 "slug": "sample-title",

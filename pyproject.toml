@@ -13,6 +13,7 @@ python-slugify = "^4.0.1"
 PyQt5 = "^5.15.0"
 
 [tool.poetry.dev-dependencies]
+pytest = "^6.0.1"
 
 [tool.poetry.scripts]
 pelican-metadata-generator = "pelican_metadata_generator.cli:main"
