@@ -1,9 +1,6 @@
-import os
-import sys
-import logging
 from slugify import slugify
 
-from PyQt5 import QtCore, QtWidgets
+from PyQt5 import QtCore
 
 
 class Controller(QtCore.QObject):

@@ -1,8 +1,7 @@
 import os
 import logging
-from slugify import slugify
 
-from PyQt5 import QtCore, QtWidgets
+from PyQt5 import QtCore
 
 import pelican_metadata_generator.file_handler
 

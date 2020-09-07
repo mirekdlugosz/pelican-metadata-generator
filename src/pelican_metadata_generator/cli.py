@@ -52,7 +52,7 @@ def main():
     known_metadata_model = pelican_metadata_generator.model.MetadataDatabase()
     post_model = pelican_metadata_generator.model.NewPostMetadata()
     window = pelican_metadata_generator.view.MainWindow()
-    controller = pelican_metadata_generator.controller.Controller(
+    controller = pelican_metadata_generator.controller.Controller(  # noqa: F841
         known_metadata_model, post_model, window
     )
 
