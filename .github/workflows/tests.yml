@@ -1,0 +1,23 @@
+name: Run tests
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: ['3.6', '3.7', '3.8']
+    name: Python ${{ matrix.python-version }}
+    steps:
+    - uses: actions/checkout@v2
+    - uses: actions/setup-python@v2
+      with:
+        python-version: ${{ matrix.python-version }}
+        architecture: x64
+    - run: pip install poetry
+    - run: poetry install
+    - run: poetry run pytest
