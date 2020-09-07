@@ -1,6 +1,6 @@
 # Pelican Metadata Generator 
 
-Graphical application that creates Pelican (<http://blog.getpelican.com/>)
+Graphical application that creates [Pelican](http://blog.getpelican.com/)
 post metadata. Written in Python 3.x and Qt 5.x (PyQt). Works on Linux,
 Windows and Mac.
 
@@ -25,7 +25,22 @@ and will serve as post file name, if you decide to save data on disk.
 
 - Python 3.x <https://www.python.org/>
 - PyQt5 <https://www.riverbankcomputing.com/software/pyqt/intro> | <https://pypi.python.org/pypi/PyQt5>
-- slugify <https://pypi.python.org/pypi/PyQt5> | <https://pypi.python.org/pypi/python-slugify>
+- slugify <https://pypi.python.org/pypi/python-slugify>
+
+## Installation
+
+This application is now published on [PyPI](https://pypi.org/project/pelican-metadata-generator/).
+You can install it using pip:
+
+```
+pip install pelican-metadata-generator
+```
+
+I recommend using [pipx](https://pipxproject.github.io/pipx/) for automatic management of isolated virtual environments:
+
+```
+pipx install pelican-metadata-generator
+```
 
 ## Installation (Windows)
 
@@ -33,13 +48,12 @@ and will serve as post file name, if you decide to save data on disk.
 - Open command prompt (`cmd.exe`) and run following commands:
       conda create -n pmg python=3
       activate pmg
-      pip install python-slugify PyQt5
-- Download this repository
+      pip install pelican-metadata-generator
 
 To run application:
 - Open command prompt (`cmd.exe`)
 - Run `activate pmg`
-- Run `<path_to_repository>/pelican-metadata-generator.py -d <path_to_pelican_content_dir>`
+- Run `pelican-metadata-generator -d <path_to_pelican_content_dir>`
 
 ## Adding to menu (Linux only)
 
