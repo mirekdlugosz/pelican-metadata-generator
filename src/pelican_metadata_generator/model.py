@@ -2,7 +2,7 @@ import os
 import logging
 from slugify import slugify
 
-from PyQt5 import (QtCore, QtWidgets)
+from PyQt5 import QtCore, QtWidgets
 
 import pelican_metadata_generator.file_handler
 
@@ -31,6 +31,7 @@ class NewPostMetadata(QtCore.QObject):
     file_format
         File format. See pelican_metadata_generator.file_handler.Factory for supported file formats.
     """
+
     changed = QtCore.pyqtSignal()
     fileHasHeaders = QtCore.pyqtSignal()
 
@@ -49,7 +50,11 @@ class NewPostMetadata(QtCore.QObject):
     @property
     def filename(self):
         """Returns file name based on file format"""
-        ext = pelican_metadata_generator.file_handler.Factory("", self.file_format).generate().default_extension
+        ext = (
+            pelican_metadata_generator.file_handler.Factory("", self.file_format)
+            .generate()
+            .default_extension
+        )
         return "{}.{}".format(self.slug, ext)
 
     def set_title(self, value):
@@ -110,7 +115,9 @@ class NewPostMetadata(QtCore.QObject):
         be done and calling appropriate method directly (adding headers
         at top of file or overwriting existing metadata).
         """
-        self.file = pelican_metadata_generator.file_handler.Factory(filepath, self.file_format).generate()
+        self.file = pelican_metadata_generator.file_handler.Factory(
+            filepath, self.file_format
+        ).generate()
 
         if self.file.has_metadata():
             self.fileHasHeaders.emit()
@@ -180,6 +187,7 @@ class MetadataDatabase(QtCore.QObject):
         ----
         It is intended for internal use of model methods.
     """
+
     changed = QtCore.pyqtSignal()
 
     def __init__(self, path=None):
@@ -202,7 +210,7 @@ class MetadataDatabase(QtCore.QObject):
             return
 
         path = os.path.abspath(path)
-        if (os.path.isdir(path)):
+        if os.path.isdir(path):
             self._readPathFiles(path)
             self.path = path
             self.changed.emit()
@@ -223,7 +231,7 @@ class MetadataDatabase(QtCore.QObject):
             return
 
         for header in post.headers:
-            if header in ['tags', 'category', 'author', 'authors']:
+            if header in ["tags", "category", "author", "authors"]:
                 self._appendMeta(header, post.headers[header])
 
     def _appendMeta(self, name, values):
@@ -234,13 +242,13 @@ class MetadataDatabase(QtCore.QObject):
         been encountered earlier.
         This way we can be sure that known values in database are unique
         """
-        if name == 'author':
-            name = 'authors'
+        if name == "author":
+            name = "authors"
 
-        if ';' in values:
-            values = values.split(';')
+        if ";" in values:
+            values = values.split(";")
         else:
-            values = values.split(',')
+            values = values.split(",")
 
         known_values = getattr(self, name)
 

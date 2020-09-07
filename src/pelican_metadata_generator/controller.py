@@ -3,7 +3,7 @@ import sys
 import logging
 from slugify import slugify
 
-from PyQt5 import (QtCore, QtWidgets)
+from PyQt5 import QtCore, QtWidgets
 
 
 class Controller(QtCore.QObject):
@@ -23,19 +23,27 @@ class Controller(QtCore.QObject):
         self.view.setupTab.dateField.dateTimeChanged.connect(self.post_model.set_created_date)
         self.view.setupTab.modifiedActive.stateChanged.connect(self._modified_date_active_changed)
         self.view.setupTab.modifiedField.dateTimeChanged.connect(self.post_model.set_modified_date)
-        self.view.setupTab.categoryList.currentIndexChanged.connect(self._category_list_item_selected)
+        self.view.setupTab.categoryList.currentIndexChanged.connect(
+            self._category_list_item_selected
+        )
         self.view.setupTab.categoryField.textChanged.connect(self.post_model.set_category)
         self.view.setupTab.tagButtonsGroup.buttonToggled.connect(self._tag_button_toggled)
         self.view.setupTab.tagField.returnPressed.connect(self._set_tags_group)
         self.view.setupTab.authorList.currentIndexChanged.connect(self._author_list_item_selected)
         self.view.setupTab.authorField.textChanged.connect(self.post_model.set_author)
-        self.view.setupTab.summaryField.textChanged.connect(lambda: self.post_model.set_summary(self.view.setupTab.summaryField.toPlainText()))
-        self.view.saveAsFileButton.clicked.connect(lambda: self.view.app.showSaveDialog(self.post_model.filename))
+        self.view.setupTab.summaryField.textChanged.connect(
+            lambda: self.post_model.set_summary(self.view.setupTab.summaryField.toPlainText())
+        )
+        self.view.saveAsFileButton.clicked.connect(
+            lambda: self.view.app.showSaveDialog(self.post_model.filename)
+        )
         self.view.saveFileDialog.fileSelected.connect(self.post_model.to_file)
         self.view.prependHeaders.connect(self.post_model.to_file_prepend_headers)
         self.view.overwriteHeaders.connect(self.post_model.to_file_overwrite_headers)
         self.post_model.fileHasHeaders.connect(self.view.show_file_exists_dialog)
-        self.post_model.changed.connect(lambda: self.view.generatedTab.set_content(self.post_model.as_pelican_header()))
+        self.post_model.changed.connect(
+            lambda: self.view.generatedTab.set_content(self.post_model.as_pelican_header())
+        )
         self.known_metadata_model.changed.connect(self._update_view_options_based_on_metadata)
 
     def _set_file_format(self, value):
@@ -80,9 +88,9 @@ class Controller(QtCore.QObject):
 
     def _set_tags_group(self):
         values = self.view.setupTab.tagField.text()
-        separator = ','
-        if ';' in values:
-            separator = ';'
+        separator = ","
+        if ";" in values:
+            separator = ";"
 
         for tag in values.split(separator):
             tag = tag.strip()
@@ -106,5 +114,7 @@ class Controller(QtCore.QObject):
     def _update_view_options_based_on_metadata(self):
         self.view.saveFileDialog.setDirectory(self.known_metadata_model.path)
         self._set_tags_group()
-        self._set_combobox_values(self.view.setupTab.categoryList, self.known_metadata_model.category)
+        self._set_combobox_values(
+            self.view.setupTab.categoryList, self.known_metadata_model.category
+        )
         self._set_combobox_values(self.view.setupTab.authorList, self.known_metadata_model.authors)

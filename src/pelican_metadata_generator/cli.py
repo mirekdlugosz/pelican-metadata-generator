@@ -3,7 +3,7 @@
 import sys
 import logging
 import argparse
-from PyQt5 import (QtCore, QtWidgets)
+from PyQt5 import QtCore, QtWidgets
 
 import pelican_metadata_generator.controller
 import pelican_metadata_generator.model
@@ -13,13 +13,19 @@ import pelican_metadata_generator.view
 def process_args():
     description = "Generate Pelican post metadata based on previous content"
     parser = argparse.ArgumentParser(description=description)
-    parser.add_argument('--format', '-f', help="Output file format",
-                        choices=["markdown", "restructuredtext"],
-                        default="markdown")
-    parser.add_argument('--debug', '-v', help="Be more verbose; may be passed up to 5 times",
-            action="count")
-    parser.add_argument('--directory', '-d', help="Directories to read metadata from",
-            nargs='*', default=[])
+    parser.add_argument(
+        "--format",
+        "-f",
+        help="Output file format",
+        choices=["markdown", "restructuredtext"],
+        default="markdown",
+    )
+    parser.add_argument(
+        "--debug", "-v", help="Be more verbose; may be passed up to 5 times", action="count"
+    )
+    parser.add_argument(
+        "--directory", "-d", help="Directories to read metadata from", nargs="*", default=[]
+    )
 
     return parser.parse_known_args()
 
@@ -36,7 +42,7 @@ def main():
             args.debug = len(debug_levels) - 1
         debug_level = debug_levels[args.debug]
 
-    logging.basicConfig(format='%(asctime)s %(message)s', level=debug_level)
+    logging.basicConfig(format="%(asctime)s %(message)s", level=debug_level)
 
     # File format
     file_format = args.format
@@ -67,5 +73,5 @@ def main():
     sys.exit(app.exec_())
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

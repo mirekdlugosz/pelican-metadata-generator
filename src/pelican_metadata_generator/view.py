@@ -1,8 +1,9 @@
-from PyQt5 import (QtCore, QtWidgets)
+from PyQt5 import QtCore, QtWidgets
 
 
 class MainWindow(QtWidgets.QMainWindow):
     """Builds main application window"""
+
     prependHeaders = QtCore.pyqtSignal()
     overwriteHeaders = QtCore.pyqtSignal()
 
@@ -20,11 +21,13 @@ class MainWindow(QtWidgets.QMainWindow):
         self.saveAsFileButton = self.app.saveAsFileButton
         self.saveFileDialog = self.app.saveFileDialog
 
-        self.read_metadata_act = QtWidgets.QAction("Read Pelican metadata from directory", self,
-                shortcut="Ctrl+O",
-                triggered=lambda: self.readMetadataDialog.exec())
-        self.quit_act = QtWidgets.QAction("&Quit", self, shortcut="Ctrl+Q",
-                triggered=self.close)
+        self.read_metadata_act = QtWidgets.QAction(
+            "Read Pelican metadata from directory",
+            self,
+            shortcut="Ctrl+O",
+            triggered=lambda: self.readMetadataDialog.exec(),
+        )
+        self.quit_act = QtWidgets.QAction("&Quit", self, shortcut="Ctrl+Q", triggered=self.close)
         self.markdown_act = QtWidgets.QAction("Markdown", self, checkable=True)
         self.restructuredtext_act = QtWidgets.QAction("ReStructuredText", self, checkable=True)
         self.choose_file_format_group = QtWidgets.QActionGroup(self)
@@ -49,10 +52,13 @@ class MainWindow(QtWidgets.QMainWindow):
             leaving current file content intact.
             If you want to select another file, cancel operation.</p>
             """
-        reply = QtWidgets.QMessageBox.question(self, "Selected file has headers",
-                message,
-                QtWidgets.QMessageBox.Yes | QtWidgets.QMessageBox.No | QtWidgets.QMessageBox.Cancel,
-                QtWidgets.QMessageBox.No)
+        reply = QtWidgets.QMessageBox.question(
+            self,
+            "Selected file has headers",
+            message,
+            QtWidgets.QMessageBox.Yes | QtWidgets.QMessageBox.No | QtWidgets.QMessageBox.Cancel,
+            QtWidgets.QMessageBox.No,
+        )
         if reply == QtWidgets.QMessageBox.Yes:
             self.overwriteHeaders.emit()
         elif reply == QtWidgets.QMessageBox.No:
@@ -93,6 +99,7 @@ class Window(QtWidgets.QWidget):
 
 class SetupTab(QtWidgets.QWidget):
     """Builds main tab (with input fields)"""
+
     def __init__(self, parent=None):
         super(SetupTab, self).__init__(parent)
 
@@ -187,6 +194,7 @@ class SetupTab(QtWidgets.QWidget):
 
 class GeneratedTab(QtWidgets.QWidget):
     """Builds preview headers tab"""
+
     def __init__(self, parent=None):
         super(GeneratedTab, self).__init__(parent)
 

@@ -8,10 +8,10 @@ from pelican_metadata_generator import model
 
 
 CUR_DIR = os.path.dirname(__file__)
-CONTENT_PATH = os.path.join(CUR_DIR, 'posts')
+CONTENT_PATH = os.path.join(CUR_DIR, "posts")
+
 
 class TestPostMetadata(unittest.TestCase):
-
     def setUp(self):
         self.post_metadata = model.NewPostMetadata()
 
@@ -41,59 +41,59 @@ class TestPostMetadata(unittest.TestCase):
 
         self.assertNotIn("authors", headers)
 
-class TestMetadataDatabase(unittest.TestCase):
 
+class TestMetadataDatabase(unittest.TestCase):
     def setUp(self):
         self.db = model.MetadataDatabase()
 
     def test_read_tags_separated_by_commas(self):
         expected = ["First", "Tag"]
 
-        self.db._parseFile(os.path.join(CONTENT_PATH , "tags_separated_by_comma.md"))
+        self.db._parseFile(os.path.join(CONTENT_PATH, "tags_separated_by_comma.md"))
 
         self.assertEqual(self.db.tags, expected)
 
     def test_read_tags_separated_by_semicolons(self):
         expected = ["First", "Tag"]
 
-        self.db._parseFile(os.path.join(CONTENT_PATH , "tags_separated_by_semicolon.md"))
+        self.db._parseFile(os.path.join(CONTENT_PATH, "tags_separated_by_semicolon.md"))
 
         self.assertEqual(self.db.tags, expected)
 
     def test_reading_files_with_different_categories(self):
         expected = ["Tags testing", "Markdown"]
 
-        self.db._parseFile(os.path.join(CONTENT_PATH , "tags_separated_by_comma.md"))
-        self.db._parseFile(os.path.join(CONTENT_PATH , "file_with_headers.md"))
+        self.db._parseFile(os.path.join(CONTENT_PATH, "tags_separated_by_comma.md"))
+        self.db._parseFile(os.path.join(CONTENT_PATH, "file_with_headers.md"))
 
         self.assertEqual(self.db.category, expected)
 
     def test_reading_files_with_the_same_categories(self):
         expected = ["Tags testing"]
 
-        self.db._parseFile(os.path.join(CONTENT_PATH , "tags_separated_by_semicolon.md"))
-        self.db._parseFile(os.path.join(CONTENT_PATH , "tags_separated_by_comma.md"))
+        self.db._parseFile(os.path.join(CONTENT_PATH, "tags_separated_by_semicolon.md"))
+        self.db._parseFile(os.path.join(CONTENT_PATH, "tags_separated_by_comma.md"))
 
         self.assertEqual(self.db.category, expected)
 
     def test_reading_files_with_intersection_of_tags(self):
         expected = ["First", "Tag", "File", "Testing"]
 
-        self.db._parseFile(os.path.join(CONTENT_PATH , "tags_separated_by_comma.md"))
-        self.db._parseFile(os.path.join(CONTENT_PATH , "file_with_headers.md"))
+        self.db._parseFile(os.path.join(CONTENT_PATH, "tags_separated_by_comma.md"))
+        self.db._parseFile(os.path.join(CONTENT_PATH, "file_with_headers.md"))
 
         self.assertEqual(self.db.tags, expected)
 
     def test_reading_file_with_author_field(self):
         expected = ["Mirosław Zalewski"]
 
-        self.db._parseFile(os.path.join(CONTENT_PATH , "author_field.md"))
+        self.db._parseFile(os.path.join(CONTENT_PATH, "author_field.md"))
 
         self.assertEqual(self.db.authors, expected)
 
     def test_reading_file_with_authors_field(self):
         expected = ["Mirosław Zalewski"]
 
-        self.db._parseFile(os.path.join(CONTENT_PATH , "authors_field.md"))
+        self.db._parseFile(os.path.join(CONTENT_PATH, "authors_field.md"))
 
         self.assertEqual(self.db.authors, expected)
