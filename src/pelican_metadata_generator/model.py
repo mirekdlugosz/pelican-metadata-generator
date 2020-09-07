@@ -4,7 +4,7 @@ from slugify import slugify
 
 from PyQt5 import (QtCore, QtWidgets)
 
-import FileHandler
+import pelican_metadata_generator.file_handler
 
 
 class NewPostMetadata(QtCore.QObject):
@@ -29,7 +29,7 @@ class NewPostMetadata(QtCore.QObject):
     summary
         Post summary
     file_format
-        File format. See FileHandler.Factory for supported file formats.
+        File format. See pelican_metadata_generator.file_handler.Factory for supported file formats.
     """
     changed = QtCore.pyqtSignal()
     fileHasHeaders = QtCore.pyqtSignal()
@@ -49,7 +49,7 @@ class NewPostMetadata(QtCore.QObject):
     @property
     def filename(self):
         """Returns file name based on file format"""
-        ext = FileHandler.Factory("", self.file_format).generate().default_extension
+        ext = pelican_metadata_generator.file_handler.Factory("", self.file_format).generate().default_extension
         return "{}.{}".format(self.slug, ext)
 
     def set_title(self, value):
@@ -110,7 +110,7 @@ class NewPostMetadata(QtCore.QObject):
         be done and calling appropriate method directly (adding headers
         at top of file or overwriting existing metadata).
         """
-        self.file = FileHandler.Factory(filepath, self.file_format).generate()
+        self.file = pelican_metadata_generator.file_handler.Factory(filepath, self.file_format).generate()
 
         if self.file.has_metadata():
             self.fileHasHeaders.emit()
@@ -151,7 +151,7 @@ class NewPostMetadata(QtCore.QObject):
     def as_pelican_header(self):
         """Returns current metadata as string, formatted according to file
         format rules"""
-        file_ = FileHandler.Factory("", self.file_format).generate()
+        file_ = pelican_metadata_generator.file_handler.Factory("", self.file_format).generate()
         file_.headers = self._format_headers_object()
         return file_.formatted_headers
 
@@ -216,7 +216,7 @@ class MetadataDatabase(QtCore.QObject):
         logging.debug("Processing {file}".format(file=path))
 
         try:
-            post = FileHandler.Factory(path).generate()
+            post = pelican_metadata_generator.file_handler.Factory(path).generate()
         except NotImplementedError:
             msg = "Ignoring {file} because it has unsupported extension"
             logging.info(msg.format(file=path))

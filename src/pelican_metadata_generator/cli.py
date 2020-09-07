@@ -5,9 +5,9 @@ import logging
 import argparse
 from PyQt5 import (QtCore, QtWidgets)
 
-import PMGModel
-import PMGView
-import PMGController
+import pelican_metadata_generator.controller
+import pelican_metadata_generator.model
+import pelican_metadata_generator.view
 
 
 def process_args():
@@ -24,7 +24,7 @@ def process_args():
     return parser.parse_known_args()
 
 
-if __name__ == '__main__':
+def main():
     args, unparsed_args = process_args()
 
     # Logging
@@ -43,10 +43,12 @@ if __name__ == '__main__':
 
     # Initialize main objects
     app = QtWidgets.QApplication(unparsed_args)
-    known_metadata_model = PMGModel.MetadataDatabase()
-    post_model = PMGModel.NewPostMetadata()
-    window = PMGView.MainWindow()
-    controller = PMGController.Controller(known_metadata_model, post_model, window)
+    known_metadata_model = pelican_metadata_generator.model.MetadataDatabase()
+    post_model = pelican_metadata_generator.model.NewPostMetadata()
+    window = pelican_metadata_generator.view.MainWindow()
+    controller = pelican_metadata_generator.controller.Controller(
+        known_metadata_model, post_model, window
+    )
 
     # Load data from source directories
     for directory in args.directory:
@@ -63,3 +65,7 @@ if __name__ == '__main__':
     window.show()
 
     sys.exit(app.exec_())
+
+
+if __name__ == '__main__':
+    main()
