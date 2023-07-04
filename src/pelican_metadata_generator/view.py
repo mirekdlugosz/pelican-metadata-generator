@@ -189,7 +189,7 @@ class SetupTab(QtWidgets.QWidget):
             button.setChecked(tag in checked_tags)
             i = self.tagButtonsLayout.count()
             inRow = 4  # FIXME: hardcoded value
-            self.tagButtonsLayout.addWidget(button, i / inRow, i % inRow)
+            self.tagButtonsLayout.addWidget(button, int(i / inRow), int(i % inRow))
 
 
 class GeneratedTab(QtWidgets.QWidget):
