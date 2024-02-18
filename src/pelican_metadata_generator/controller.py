@@ -26,6 +26,10 @@ class Controller(QtCore.QObject):
         self.view.setupTab.categoryField.textChanged.connect(self.post_model.set_category)
         self.view.setupTab.tagButtonsGroup.buttonToggled.connect(self._tag_button_toggled)
         self.view.setupTab.tagField.returnPressed.connect(self._set_tags_group)
+        self.view.setupTab.seriesList.currentIndexChanged.connect(
+            self._series_list_item_selected
+        )
+        self.view.setupTab.seriesField.textChanged.connect(self.post_model.set_series)
         self.view.setupTab.authorList.currentIndexChanged.connect(self._author_list_item_selected)
         self.view.setupTab.authorField.textChanged.connect(self.post_model.set_author)
         self.view.setupTab.summaryField.textChanged.connect(
@@ -65,6 +69,13 @@ class Controller(QtCore.QObject):
         else:
             value = self.view.setupTab.categoryList.itemText(value)
         self.view.setupTab.categoryField.setText(value)
+
+    def _series_list_item_selected(self, value):
+        if value == 0:
+            value = ""
+        else:
+            value = self.view.setupTab.seriesList.itemText(value)
+        self.view.setupTab.seriesField.setText(value)
 
     def _author_list_item_selected(self, value):
         if value == 0:
@@ -113,5 +124,8 @@ class Controller(QtCore.QObject):
         self._set_tags_group()
         self._set_combobox_values(
             self.view.setupTab.categoryList, self.known_metadata_model.category
+        )
+        self._set_combobox_values(
+            self.view.setupTab.seriesList, self.known_metadata_model.series
         )
         self._set_combobox_values(self.view.setupTab.authorList, self.known_metadata_model.authors)

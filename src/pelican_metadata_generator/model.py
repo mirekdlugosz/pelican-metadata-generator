@@ -42,6 +42,7 @@ class NewPostMetadata(QtCore.QObject):
         self.modified = ""
         self.category = ""
         self.tags = []
+        self.series = ""
         self.authors = []
         self.summary = ""
         self.file_format = ""
@@ -93,6 +94,10 @@ class NewPostMetadata(QtCore.QObject):
             self.authors = []
         else:
             self.authors = [value]
+        self.changed.emit()
+
+    def set_series(self, value):
+        self.series = value
         self.changed.emit()
 
     def set_summary(self, text):
@@ -148,7 +153,7 @@ class NewPostMetadata(QtCore.QObject):
 
             headers[key] = separator.join(sorted(values, key=str.lower))
 
-        for key in ["title", "slug", "date", "modified", "category", "summary"]:
+        for key in ["title", "slug", "date", "modified", "category", "series", "summary"]:
             if getattr(self, key):
                 headers[key] = getattr(self, key)
 
@@ -194,6 +199,7 @@ class MetadataDatabase(QtCore.QObject):
         self.category = []
         self.tags = []
         self.authors = []
+        self.series = []
         self.path = []
         self.read_directory(path)
 
@@ -230,7 +236,7 @@ class MetadataDatabase(QtCore.QObject):
             return
 
         for header in post.headers:
-            if header in ["tags", "category", "author", "authors"]:
+            if header in ["tags", "category", "author", "authors", "series"]:
                 self._appendMeta(header, post.headers[header])
 
     def _appendMeta(self, name, values):
