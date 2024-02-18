@@ -191,7 +191,7 @@ class MarkdownHandler(AbstractFileHandler):
     @property
     def formatted_headers(self):
         output = []
-        for key in ["title", "slug", "date", "modified", "category", "tags", "authors", "summary"]:
+        for key in ["title", "slug", "date", "modified", "category", "tags", "authors", "series", "summary"]:
             if key in self.headers:
                 output.append("{}: {}".format(key.title(), self.headers[key]))
 
@@ -271,7 +271,7 @@ class RestructuredtextHandler(AbstractFileHandler):
             output.append("#" * len(self.headers["title"]))
             output.append("")
 
-        for key in ["slug", "date", "modified", "category", "tags", "authors", "summary"]:
+        for key in ["slug", "date", "modified", "category", "tags", "authors", "series", "summary"]:
             if key in self.headers:
                 output.append(":{}: {}".format(key.lower(), self.headers[key]))
 

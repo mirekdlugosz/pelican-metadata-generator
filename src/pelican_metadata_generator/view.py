@@ -149,6 +149,12 @@ class SetupTab(QtWidgets.QWidget):
         self.tagLine.addWidget(tagButtonsScrollArea)
         self.tagLine.addWidget(self.tagField)
 
+        self.seriesList = QtWidgets.QComboBox()
+        self.seriesField = QtWidgets.QLineEdit()
+        self.seriesLine = QtWidgets.QHBoxLayout()
+        self.seriesLine.addWidget(self.seriesList)
+        self.seriesLine.addWidget(self.seriesField)
+
         self.authorList = QtWidgets.QComboBox()
         self.authorField = QtWidgets.QLineEdit()
         self.authorLine = QtWidgets.QHBoxLayout()
@@ -165,6 +171,7 @@ class SetupTab(QtWidgets.QWidget):
         mainLayout.addRow("Date modified:", self.modifiedLine)
         mainLayout.addRow("Category:", self.categoryLine)
         mainLayout.addRow("Tags:", self.tagLine)
+        mainLayout.addRow("Series:", self.seriesLine)
         mainLayout.addRow("Author:", self.authorLine)
         mainLayout.addRow("Summary", self.summaryField)
         self.setLayout(mainLayout)
