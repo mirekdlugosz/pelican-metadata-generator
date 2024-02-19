@@ -13,7 +13,7 @@ CONTENT_PATH = os.path.join(CUR_DIR, "posts")
 
 class TestPostMetadata(unittest.TestCase):
     def setUp(self):
-        self.post_metadata = model.NewPostMetadata()
+        self.post_metadata = model.NewPostMetadata(filename_template="{slug}")
 
     def test_tags_order(self):
         expected = "Another, Tag"

@@ -14,6 +14,12 @@ def process_args():
     description = "Generate Pelican post metadata based on previous content"
     parser = argparse.ArgumentParser(description=description)
     parser.add_argument(
+        "--filename-template",
+        "-t",
+        help="Output filename template",
+        default="{slug}.{ext}"
+    )
+    parser.add_argument(
         "--format",
         "-f",
         help="Output file format",
@@ -44,13 +50,17 @@ def main():
 
     logging.basicConfig(format="%(asctime)s %(message)s", level=debug_level)
 
+    filename_template = args.filename_template
+
     # File format
     file_format = args.format
 
     # Initialize main objects
     app = QtWidgets.QApplication(unparsed_args)
     known_metadata_model = pelican_metadata_generator.model.MetadataDatabase()
-    post_model = pelican_metadata_generator.model.NewPostMetadata()
+    post_model = pelican_metadata_generator.model.NewPostMetadata(
+        filename_template=filename_template
+    )
     window = pelican_metadata_generator.view.MainWindow()
     controller = pelican_metadata_generator.controller.Controller(  # noqa: F841
         known_metadata_model, post_model, window

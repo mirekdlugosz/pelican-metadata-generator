@@ -1,5 +1,6 @@
 import os
 import logging
+from datetime import datetime
 
 from PyQt5 import QtCore
 
@@ -34,7 +35,7 @@ class NewPostMetadata(QtCore.QObject):
     changed = QtCore.pyqtSignal()
     fileHasHeaders = QtCore.pyqtSignal()
 
-    def __init__(self):
+    def __init__(self, filename_template):
         super(NewPostMetadata, self).__init__(None)
         self.title = ""
         self.slug = ""
@@ -46,6 +47,7 @@ class NewPostMetadata(QtCore.QObject):
         self.authors = []
         self.summary = ""
         self.file_format = ""
+        self.filename_template = filename_template
 
     @property
     def filename(self):
@@ -55,7 +57,18 @@ class NewPostMetadata(QtCore.QObject):
             .generate()
             .default_extension
         )
-        return "{}.{}".format(self.slug, ext)
+        parsed_date = datetime.strptime(self.date, "%Y-%m-%d %H:%M:%S")
+        return self.filename_template.format(
+            year=parsed_date.year,
+            month=parsed_date.month,
+            day=parsed_date.day,
+            hour=parsed_date.hour,
+            minute=parsed_date.minute,
+            second=parsed_date.second,
+            category=self.category,
+            slug=self.slug,
+            ext=ext
+        )
 
     def set_title(self, value):
         self.title = value
