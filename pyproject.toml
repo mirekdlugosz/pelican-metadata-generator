@@ -1,26 +1,32 @@
-[tool.poetry]
+[project]
 name = "pelican-metadata-generator"
-version = "0.2.0"
+version = "0.2.1"
 description = ""
-authors = ["Mirek Długosz <mirek@mirekdlugosz.com>"]
-license = "AGPL-3.0-or-later"
+authors = [
+    {name = "Mirek Długosz", email = "mirek@mirekdlugosz.com"},
+]
+license = { text = "AGPL-3.0-or-later" }
 readme = "README.md"
-repository = "https://github.com/mirekdlugosz/pelican-metadata-generator"
+requires-python = ">=3.9"
+dependencies = [
+    "python-slugify (>=8.0.4,<9.0.0)",
+    "PyQt5 (>=5.15.0,<6.0.0)",
+    "PyQt5-Qt5 (>=5.15.2,<6.0.0)",
+]
 
-[tool.poetry.dependencies]
-python = "^3.9"
-python-slugify = "^8.0.4"
-PyQt5 = "^5.15.0"
-PyQt5-Qt5 = "5.15.2"
+[project.optional-dependencies]
+dev = [
+    "pytest (>=8.0.1,<9.0.0)",
+    "flake8 (>=7.0.0,<8.0.0)",
+    "black (>=24.2.0,<25.0.0)",
+]
 
-[tool.poetry.dev-dependencies]
-pytest = "^8.0.1"
-flake8 = "^7.0.0"
-black = "^24.2.0"
+[project.urls]
+Repository = "https://github.com/mirekdlugosz/pelican-metadata-generator"
 
-[tool.poetry.scripts]
+[project.scripts]
 pelican-metadata-generator = "pelican_metadata_generator.cli:main"
 
 [build-system]
-requires = ["poetry>=0.12"]
+requires = ["poetry>=2.0.0"]
 build-backend = "poetry.masonry.api"
